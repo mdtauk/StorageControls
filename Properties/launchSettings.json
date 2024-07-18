@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "StorageControls (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "StorageControls (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
