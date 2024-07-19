@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Shapes;
 using System;
 using Windows.Foundation;
+using Windows.Security.Cryptography.Core;
 
 namespace StorageControls
 {
@@ -124,7 +125,13 @@ namespace StorageControls
 
             if (mainRing != null)
             {
-                if (percentageRing.Value == percentageRing.GetMaxValue())
+                // Between the min value and min value + 1
+                if (percentageRing.Value > percentageRing.GetMinValue() && percentageRing.Value < percentageRing.GetMinValue() + 1)
+                {
+                    percentageRing.DrawArc(d, ringCentre, valueAngle, percentageRing.GetMainArcLargeAngleCheck(valueAngle, 0), (MinAngle), (MinAngle + 0.01), mainRing, ringThickness, SweepDirection.Clockwise);
+                    mainRing.StrokeThickness = percentageRing.GetMainRingThickness() * percentageRing.Value;
+                }
+                else if (percentageRing.Value == percentageRing.GetMaxValue())
                 {
                     // At 100% we draw a full circle for the ring
                     var eg = new EllipseGeometry
@@ -140,32 +147,8 @@ namespace StorageControls
                 }
                 else
                 {
-                    #region Code for drawing arc based on value around the ring
-                    var pg = new PathGeometry();
-                    var pf = new PathFigure
-                    {
-                        IsClosed = false
-                    };
-
-                    // Sets the start point to the top and centre of the canvas
-                    pf.StartPoint = percentageRing.GetPointAroundRadius(0, ringCentre);
-
-                    var seg = new ArcSegment
-                    {
-                        SweepDirection = SweepDirection.Clockwise,
-                        IsLargeArc = valueAngle > 180.0,
-                        Size = new Size(ringCentre, ringCentre),
-
-                        // Sets the end point to an angle, calculated from the value, to a position around the radius of the ring
-                        Point = percentageRing.GetPointAroundRadius(valueAngle, ringCentre)
-                    };
-
-                    pf.Segments.Add(seg);
-                    pg.Figures.Add(pf);
-
-                    mainRing.Data = pg;
+                    percentageRing.DrawArc(d, ringCentre, valueAngle, percentageRing.GetMainArcLargeAngleCheck(valueAngle, 0), 0, valueAngle, mainRing, ringThickness, SweepDirection.Clockwise);
                     mainRing.StrokeThickness = ringThickness;
-                    #endregion
                 }
             }
         }
@@ -185,8 +168,31 @@ namespace StorageControls
             var ringCentre = percentageRing.GetTrackRingRadius(Radius, percentageRing.GetTrackRingThickness());
 
             if (trackRing != null)
-            {
-                if (percentageRing.Value == percentageRing.GetMinValue())
+            {                
+                if (percentageRing.Value > 0 && percentageRing.Value < 1)
+                {
+                    //
+                    // Start Angle is 360 - 36 for the spacing.
+                    // we want the start to be 360 at value = 0
+                    // then when value = 1, to be at 360-36 which is 324
+                    //
+                    // so a value between 324 and 360 between value 0 and 1
+                    //
+                    double beginStartAngle = MaxAngle; // Initial start angle
+                    double beginEndAngle = MaxAngle - (MainRingSpacingDeg / 4); // Angle when value = 1
+
+                    double endStartAngle = MinAngle; // Initial start angle
+                    double endEndAngle = MinAngle + (MainRingSpacingDeg / 4); // Angle when value = 1
+
+
+                    double adjustStart = (MaxAngle - MainRingSpacingDeg) / valueAngle;
+
+                    percentageRing.DrawArc(d, ringCentre, valueAngle, percentageRing.GetTrackArcLargeAngleCheck(valueAngle, 0), GetAdjustedAngle(beginStartAngle, beginEndAngle, valueAngle), GetAdjustedAngle(endStartAngle, endEndAngle, valueAngle), trackRing, ringThickness, SweepDirection.Counterclockwise);
+
+                    trackRing.StrokeThickness = ringThickness;
+                    trackRing.Visibility = Visibility.Visible;
+                }
+                else if (percentageRing.Value == percentageRing.GetMinValue())
                 {
                     // At 0% we draw a full circle as our ring
                     var eg = new EllipseGeometry
@@ -199,40 +205,122 @@ namespace StorageControls
 
                     trackRing.Data = eg;
                     trackRing.StrokeThickness = percentageRing.GetTrackRingThickness();
-                }
+                }                      
                 else
                 {
-                    //
-                    // Draw the Track ring as the inverse of the Main ring to start with
-                    //
-                    #region Code for drawing inverse arc based on value around the ring
-                    var pg = new PathGeometry();
-                    var pf = new PathFigure
+                    if (valueAngle > (MaxAngle - (MainRingSpacingDeg * 2) - 1) && valueAngle < (MaxAngle - (MainRingSpacingDeg * 2) + MainRingSpacingDeg))
                     {
-                        IsClosed = false
-                    };
+                        // We fix the end and start points as the track reaches its end
+                        percentageRing.DrawArc(d, ringCentre, (MaxAngle - MainRingSpacingDeg), percentageRing.GetTrackArcLargeAngleCheck(valueAngle, MainRingSpacingDeg), (MaxAngle - MainRingSpacingDeg), (MaxAngle - (MainRingSpacingDeg + 1)), trackRing, ringThickness, SweepDirection.Counterclockwise);
 
-                    // NEED TO ADJUST START POINT TO BE NOT AT 0
-                    pf.StartPoint = percentageRing.GetPointAroundRadius(360-36, ringCentre);
+                        #region Code to get the thickness value as the angle changes
 
-                    var seg = new ArcSegment
+                        // Calculate the start angle for thinning (subtracting 4 from MainRingSpacingDeg)
+                        double startThinningAngle = MaxAngle - (MainRingSpacingDeg - 4);
+
+                        // Calculate the end angle for thinning (based on TrackRingSpacingDeg)
+                        double endThinningAngle = MaxAngle - TrackRingSpacingDeg;
+
+                        // Calculate the current thinning angle (adding MainRingSpacingDeg and half of TrackRingSpacingDeg)
+                        double currentThinningAngle = valueAngle + MainRingSpacingDeg + (TrackRingSpacingDeg / 2);
+
+                        // Get the initial thickness from the percentage ring
+                        double startThickness = percentageRing.GetTrackRingThickness();
+
+                        // Set the end thickness to 0 (assuming thinning means reducing thickness)
+                        double endThickness = 0;
+
+                        // Initialize the variable for the current thickness value
+                        double currentThicknessValue;
+
+                        // Ensure currentThinningAngle is within the valid range
+                        currentThinningAngle = Math.Max(startThinningAngle, Math.Min(endThinningAngle, currentThinningAngle));
+
+                        // Calculate the interpolation factor (t) based on the angle range
+                        double t = (currentThinningAngle - startThinningAngle) / (endThinningAngle - startThinningAngle);
+
+                        // Linearly interpolate between startThickness and endThickness
+                        currentThicknessValue = startThickness * (1 - t) + endThickness * t;
+
+                        #endregion
+
+                        trackRing.StrokeThickness = currentThicknessValue;
+                    }
+                    else if (valueAngle > (MaxAngle - (MainRingSpacingDeg * 2) + (TrackRingSpacingDeg * 2) - 1))
                     {
-                        SweepDirection = SweepDirection.Counterclockwise,
-                        IsLargeArc = valueAngle < 180.0-(36*2),
-                        Size = new Size(ringCentre, ringCentre),
+                        // Hide Track ring when it reaches the end of the available track
+                        trackRing.Visibility = Visibility.Collapsed;
+                    }
+                    else
+                    {
+                        trackRing.Visibility = Visibility.Visible;
 
-                        // Sets the end point to an angle, calculated from the value, to a position around the radius of the ring
-                        Point = percentageRing.GetPointAroundRadius(valueAngle+36, ringCentre)
-                    };
-
-                    pf.Segments.Add(seg);
-                    pg.Figures.Add(pf);
-
-                    trackRing.Data = pg;
-                    trackRing.StrokeThickness = ringThickness;
-                    #endregion
+                        percentageRing.DrawArc(d, ringCentre, valueAngle, percentageRing.GetTrackArcLargeAngleCheck(valueAngle, MainRingSpacingDeg), (MaxAngle - MainRingSpacingDeg), (valueAngle + MainRingSpacingDeg), trackRing, ringThickness, SweepDirection.Counterclockwise);
+                        trackRing.StrokeThickness = ringThickness;
+                    }
                 }
             }
+        }
+
+
+        /// <summary>
+        /// Draws an arc segment representing a percentage value of the ring.
+        /// </summary>
+        /// <param name="d">The DependencyObject representing the PercentageRing.</param>
+        /// <param name="ringCentre">The center point of the ring.</param>
+        /// <param name="valueAngle">The angle corresponding to the percentage value (in degrees).</param>
+        /// <param name="largeArcAngle">A boolean indicating whether the arc is a large arc.</param>
+        /// <param name="startAngle">The starting angle of the arc (in degrees).</param>
+        /// <param name="endAngle">The ending angle of the arc (in degrees).</param>
+        /// <param name="ringPath">The Path control used to display the arc.</param>
+        /// <param name="ringThickness">The stroke thickness of the arc.</param>
+        /// <param name="sweep">The direction in which the arc sweeps (Clockwise or Counterclockwise).</param>
+        private void DrawArc(DependencyObject d, double ringCentre, double valueAngle, bool largeArcAngle, double startAngle, double endAngle, Path ringPath, double ringThickness, SweepDirection sweep)
+        {
+            var percentageRing = (PercentageRing)d;
+
+            var pg = new PathGeometry();
+            var pf = new PathFigure
+            {
+                IsClosed = false
+            };
+
+            // Sets the start point to the top and centre of the canvas
+            pf.StartPoint = percentageRing.GetPointAroundRadius(startAngle, ringCentre);
+
+            var seg = new ArcSegment
+            {
+                SweepDirection = sweep,
+                IsLargeArc = largeArcAngle,
+                Size = new Size(ringCentre, ringCentre),
+
+                // Sets the end point to an angle, calculated from the value, to a position around the radius of the ring
+                Point = percentageRing.GetPointAroundRadius(endAngle, ringCentre)
+            };
+
+            pf.Segments.Add(seg);
+            pg.Figures.Add(pf);
+
+            ringPath.Data = pg;
+        }
+
+
+        static double GetAdjustedAngle(double startAngle, double endAngle, double valueAngle)
+        {
+            // Linear interpolation formula (lerp): GetAdjustedAngle = startAngle + valueAngle * (endAngle - startAngle)
+            return startAngle + valueAngle * (endAngle - startAngle);
+        }
+
+
+        private bool GetMainArcLargeAngleCheck(double angle, double spacing)
+        {
+            return angle > 180.0;
+        }
+
+
+        private bool GetTrackArcLargeAngleCheck(double angle, double spacing)
+        {
+            return angle < 180.0 - (spacing * 2);
         }
 
 

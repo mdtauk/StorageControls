@@ -23,16 +23,16 @@
                         <Canvas x:Name="PART_RingCanvas"
                                 Width="160"
                                 Height="160"
-                                Background="DarkBlue">
+                                Background="Transparent">
                             <Path x:Name="PART_ScalePath"
-                                  Stroke="Red"
-                                  StrokeEndLineCap="Triangle"
+                                  Stroke="{ThemeResource AccentFillColorDefaultBrush}"
+                                  StrokeEndLineCap="Round"
                                   StrokeLineJoin="Round"
                                   StrokeStartLineCap="Round" />
 
                             <Path x:Name="PART_TrailPath"
-                                  Stroke="Gray"
-                                  StrokeEndLineCap="Triangle"
+                                  Stroke="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                  StrokeEndLineCap="Round"
                                   StrokeLineJoin="Round"
                                   StrokeStartLineCap="Round" />
                         </Canvas>

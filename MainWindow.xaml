@@ -5,8 +5,11 @@
         xmlns:local="using:StorageControls"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d">
+    <Window.SystemBackdrop>
+        <MicaBackdrop Kind="Base" />
+    </Window.SystemBackdrop>
 
-    <Grid>
+    <Grid Padding="0,64,0,0">
 
         <local:PercentageRing x:Name="percentRing"
                               Width="320"
