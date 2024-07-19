@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <Window x:Class="StorageControls.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -9,9 +8,19 @@
 
     <Grid>
 
-        <local:PercentageRing x:Name="percentRing" Value="{x:Bind testSlider.Value, Mode=TwoWay}" Width="320" Height="320"/>
+        <local:PercentageRing x:Name="percentRing"
+                              Width="320"
+                              Height="320"
+                              Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
 
-        <Slider x:Name="testSlider" Minimum="{x:Bind percentRing.Minimum}" Maximum="{x:Bind percentRing.Maximum}" Width="480" SmallChange="{x:Bind percentRing.SmallChange}" LargeChange="{x:Bind percentRing.LargeChange}" StepFrequency="{x:Bind percentRing.SmallChange}"/>
+        <Slider x:Name="testSlider"
+                Value="25"
+                Width="480"
+                LargeChange="{x:Bind percentRing.LargeChange}"
+                Maximum="{x:Bind percentRing.Maximum}"
+                Minimum="{x:Bind percentRing.Minimum}"
+                SmallChange="{x:Bind percentRing.SmallChange}"
+                StepFrequency="{x:Bind percentRing.SmallChange}" />
 
     </Grid>
 </Window>

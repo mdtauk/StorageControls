@@ -1,52 +1,47 @@
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Automation.Peers;
-using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Documents;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Shapes;
 using System;
-using System.Numerics;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace StorageControls
 {
     /// <summary>
-    /// A Percentage Ring Control.
+    /// A control which takes a value and converts to a percentage displayed on a circular ring
     /// </summary>
     //// All calculations are for a 160 x 160 square. The ViewBox control will handle scaling.
     public partial class PercentageRing : RangeBase
     {
+        #region Private variables
+
         // Constant values
-        private const double Degrees2Radians = Math.PI / 180;
+        private const double DegToRad = Math.PI / 180;
         private const double Radius = 80;
-        private const int iRadius = 80;
         private const double MinAngle = 0;
         private const double MaxAngle = 360;
-        private const double ScaleAngle99 = 360 - ScaleAngle01;
-        private const double ScaleAngle98 = ScaleAngle99 - TrailAngle01;
-        private const double ScaleAngle01 = 36;
-        private const double TrailAngle01 = 9;
+        private const double TrackRingSpacingDeg = 9;
+        private const double MainRingSpacingDeg = 36;
+
+        // Updatable values
+        private double _mainRingThickness;
+        private double _trackRingThickness;
+
+        private double _minValue; 
+        private double _maxValue;
+        private double _value;
+
         private double _normalizedMinAngle;
         private double _normalizedMaxAngle;
 
-        // Updating values
-        double _scaleThickness;
-        double _trailThickness;
-        double _halfScaleThickness;
-        double _halfTrailThickness;        
+        #endregion
+
 
         public PercentageRing()
         {
             this.DefaultStyleKey = typeof(PercentageRing);
         }
+
 
         /// <summary>
         /// Update the visual state of the control when its template is changed.
@@ -55,239 +50,204 @@ namespace StorageControls
         {
             base.OnApplyTemplate();
 
-            UpdateRings(this);
-        }
-
-        private static void ScaleThicknessChanged(DependencyObject d, double newValue)
-        {
-            // Handles changes in ScaleThickness property values
-
-            //var percentageRing = (PercentageRing)d;
-
-            //percentageRing.UpdateScaleThickness(newValue);
-
-            UpdateRings(d);
-        }
-
-        private static void TrailThicknessChanged(DependencyObject d, double newValue)
-        {
-            // Handles changes in TrailThickness property values
-            //var percentageRing = (PercentageRing)d;
-
-            //percentageRing.UpdateTrailThickness(newValue);
-
-            UpdateRings(d);
-        }
-
-        private void UpdateScaleThickness(double value)
-        {
-            _scaleThickness = value;
-            _halfScaleThickness = value / 2;
-        }
-
-        private void UpdateTrailThickness(double value)
-        {
-            _trailThickness = value;
-            _halfTrailThickness = value / 2;
+            UpdateAllRings(this);
         }
 
 
         /// <summary>
-        /// Update the scale and trail rings
+        /// Runs when the Main ring Thickness property changes
         /// </summary>
-        private static void UpdateRings(DependencyObject d)
-        { 
+        private static void MainRingThicknessChanged(DependencyObject d, double newValue)
+        {
             var percentageRing = (PercentageRing)d;
 
-            var trailRing = percentageRing.GetTemplateChild(TrailPartName) as Path;
-            var scaleRing = percentageRing.GetTemplateChild(ScalePartName) as Path;
+            percentageRing.UpdateMainRingThickness(newValue);
 
-            var trailDot = percentageRing.GetTemplateChild(TrailDotPartName) as Ellipse;
-            var scaleDot = percentageRing.GetTemplateChild(ScaleDotPartName) as Ellipse;
+            UpdateAllRings(d);
+        }
 
-            // Update Trail, if it is not null
-            if (trailRing != null)
+
+        /// <summary>
+        /// Runs when the Track ring Thickness property changes
+        /// </summary>
+        private static void TrackRingThicknessChanged(DependencyObject d, double newValue)
+        {
+            var percentageRing = (PercentageRing)d;
+
+            percentageRing.UpdateTrackRingThickness(newValue);
+
+            UpdateAllRings(d);
+        }
+
+
+        /// <summary>
+        /// Updates the private Main ring thickness variable
+        /// </summary>
+        private void UpdateMainRingThickness(double value)
+        {
+            _mainRingThickness = value;
+        }
+
+
+        /// <summary>
+        /// Updates the private Track ring thickness variable
+        /// </summary>
+        private void UpdateTrackRingThickness(double value)
+        {
+            _trackRingThickness = value;
+        }
+
+
+        /// <summary>
+        /// Update all rings
+        /// </summary>
+        private static void UpdateAllRings(DependencyObject d)
+        {
+            UpdateMainRing(d);
+
+            UpdateTrackRing(d);
+        }
+
+
+        /// <summary>
+        /// Update the Main ring
+        /// </summary>
+        private static void UpdateMainRing(DependencyObject d)
+        {
+            var percentageRing = (PercentageRing)d;
+
+            var mainRing = percentageRing.GetTemplateChild(ScalePartName) as Path;
+
+            var ringThickness = percentageRing.GetMainRingThickness();
+            var valueAngle = percentageRing.ValueToAngle(percentageRing.Value, MinAngle, MaxAngle);
+            var ringCentre = percentageRing.GetMainRingRadius(Radius, percentageRing.GetMainRingThickness());
+
+            if (mainRing != null)
             {
-                // if value is 0, the trail should be an ellipse
-                // if value is > 0 but < 1, the trail should have a gap
-                // if value is 99 but < 100, the trail should be a dot
-                // if value is 100, the trail should be gone
-                // then we draw the trail ring
-
-                if (percentageRing.Value == percentageRing.Minimum)
+                if (percentageRing.Value == percentageRing.GetMaxValue())
                 {
-                    // Draw full circle.
+                    // At 100% we draw a full circle for the ring
                     var eg = new EllipseGeometry
                     {
                         Center = new Point(Radius, Radius),
-                        RadiusX = percentageRing.GetTrailRadius(Radius, percentageRing.TrailThickness)
+                        RadiusX = percentageRing.GetTrackRingRadius(Radius, percentageRing.GetTrackRingThickness())
                     };
 
                     eg.RadiusY = eg.RadiusX;
-                    trailRing.Data = eg;
-                    trailRing.StrokeThickness = percentageRing.TrailThickness;
-                }
-                // TODO Calculate the next value up from minimum, small and large change property maybe
-                else if (percentageRing.Value > percentageRing.Minimum && percentageRing.Value < 1)
-                {
-                    // Draw trail with gap
-                    // Start Angle 27 \| CCW <-
-                    // End Angle 153 |/
 
-                    // Draw arc segment
+                    mainRing.Data = eg;
+                    mainRing.StrokeThickness = ringThickness;
+                }
+                else
+                {
+                    #region Code for drawing arc based on value around the ring
                     var pg = new PathGeometry();
                     var pf = new PathFigure
                     {
                         IsClosed = false
                     };
-                    var middleOfScale = percentageRing.GetScaleRadius(Radius, percentageRing.ScaleThickness);
 
-                    pf.StartPoint = percentageRing.ScaleRingPoint(percentageRing.ValueToAngle(percentageRing.Value, 0, 360), middleOfScale);
+                    // Sets the start point to the top and centre of the canvas
+                    pf.StartPoint = percentageRing.GetPointAroundRadius(0, ringCentre);
 
                     var seg = new ArcSegment
                     {
                         SweepDirection = SweepDirection.Clockwise,
-                        IsLargeArc = percentageRing.ValueToAngle(percentageRing.Value, 0, 360) > 180,
-                        Size = new Size(middleOfScale, middleOfScale),
-                        Point = percentageRing.ScaleRingPoint(0, middleOfScale)
+                        IsLargeArc = valueAngle > 180.0,
+                        Size = new Size(ringCentre, ringCentre),
+
+                        // Sets the end point to an angle, calculated from the value, to a position around the radius of the ring
+                        Point = percentageRing.GetPointAroundRadius(valueAngle, ringCentre)
                     };
 
                     pf.Segments.Add(seg);
                     pg.Figures.Add(pf);
 
-                    scaleRing.Data = pg;
-                    scaleRing.StrokeThickness = percentageRing.ScaleThickness;
-                }
-                // TODO Calculate the next value down from maximum, small and large change property maybe
-                else if (percentageRing.Value > 98 && percentageRing.Value < percentageRing.Maximum)
-                {
-                    // Draw trail as dot
-                    // Angle 27 \| CCW <-
-                }
-                else if (percentageRing.Value == percentageRing.Maximum)
-                {
-                    // Hide trail ring
-                    trailRing.Visibility = Visibility.Collapsed;
-                }
-                else
-                {
-                    // Draw trail with space between scale path arc
-
-                    trailRing.Visibility = Visibility.Visible;
+                    mainRing.Data = pg;
+                    mainRing.StrokeThickness = ringThickness;
+                    #endregion
                 }
             }
+        }
 
-            // Update Scale, if it is not null
-            if (scaleRing != null)
+
+        /// <summary>
+        /// Update the Track ring
+        /// </summary>
+        private static void UpdateTrackRing(DependencyObject d)
+        {
+            var percentageRing = (PercentageRing)d;
+
+            var trackRing = percentageRing.GetTemplateChild(TrailPartName) as Path;
+
+            var ringThickness = percentageRing.GetTrackRingThickness();
+            var valueAngle = percentageRing.ValueToAngle(percentageRing.Value, 0, 360);
+            var ringCentre = percentageRing.GetTrackRingRadius(Radius, percentageRing.GetTrackRingThickness());
+
+            if (trackRing != null)
             {
-                // if value is 0, the scale should be gone
-                // if value is > 0 but < 1, the scale should be a dot
-                // if value is 99 but < 100, the scale should have a gap
-                // if value is 100, the scale should be an ellipse
-                // then we draw the Scale ring
-
-                if (percentageRing.Value == percentageRing.Minimum)
+                if (percentageRing.Value == percentageRing.GetMinValue())
                 {
-                    // Hide scale ring
-                    scaleRing.Visibility = Visibility.Collapsed;
-                    scaleDot.Visibility = Visibility.Collapsed;
-                }
-                // TODO Calculate the next value up from minimum, small and large change property maybe
-                else if (percentageRing.Value > percentageRing.Minimum && percentageRing.Value < 1)
-                {
-                    scaleRing.Visibility = Visibility.Collapsed;
-                    scaleDot.Visibility = Visibility.Visible;
-
-                    var trailDotTransform = percentageRing.GetTemplateChild(ScaleDotTransformPartName) as ScaleTransform;
-                    trailDotTransform.ScaleX = percentageRing.Value;
-                    trailDotTransform.ScaleY = percentageRing.Value;
-
-                }
-                // TODO Calculate the next value down from maximum, small and large change property maybe
-                else if (percentageRing.Value == 98 && percentageRing.Value < percentageRing.Maximum)
-                {
-                    // Draw arc segment
-                    var pg = new PathGeometry();
-                    var pf = new PathFigure
-                    {
-                        IsClosed = false
-                    };
-                    var middleOfScale = percentageRing.GetScaleRadius(Radius, percentageRing.ScaleThickness);
-
-                    pf.StartPoint = percentageRing.ScaleRingPoint(ScaleAngle98, middleOfScale);
-
-                    var seg = new ArcSegment
-                    {
-                        SweepDirection = SweepDirection.Counterclockwise,
-                        IsLargeArc = percentageRing.ValueToAngle(percentageRing.Value, 0, 360) > 180,
-                        Size = new Size(middleOfScale, middleOfScale),
-                        Point = percentageRing.ScaleRingPoint(0, middleOfScale)
-                    };
-
-                    pf.Segments.Add(seg);
-                    pg.Figures.Add(pf);
-
-                    scaleRing.Data = pg;
-                    scaleRing.StrokeThickness = percentageRing.ScaleThickness;
-
-                    scaleRing.Visibility = Visibility.Visible;
-                    scaleDot.Visibility = Visibility.Collapsed;
-                }
-                else if (percentageRing.Value == percentageRing.Maximum)
-                {
-                    // Draw full circle.
+                    // At 0% we draw a full circle as our ring
                     var eg = new EllipseGeometry
                     {
                         Center = new Point(Radius, Radius),
-                        RadiusX = percentageRing.GetScaleRadius(Radius, percentageRing.ScaleThickness)
+                        RadiusX = percentageRing.GetTrackRingRadius(Radius, percentageRing.GetTrackRingThickness())
                     };
 
                     eg.RadiusY = eg.RadiusX;
 
-                    scaleRing.Data = eg;
-                    scaleRing.StrokeThickness = percentageRing.ScaleThickness;
+                    trackRing.Data = eg;
+                    trackRing.StrokeThickness = percentageRing.GetTrackRingThickness();
                 }
                 else
                 {
-                    // Draw arc segment
+                    //
+                    // Draw the Track ring as the inverse of the Main ring to start with
+                    //
+                    #region Code for drawing inverse arc based on value around the ring
                     var pg = new PathGeometry();
                     var pf = new PathFigure
                     {
                         IsClosed = false
                     };
-                    var middleOfScale = percentageRing.GetScaleRadius(Radius, percentageRing.ScaleThickness);
 
-                    pf.StartPoint = percentageRing.ScaleRingPoint(percentageRing.ValueToAngle(percentageRing.Value, 0, ScaleAngle98), middleOfScale);
+                    // NEED TO ADJUST START POINT TO BE NOT AT 0
+                    pf.StartPoint = percentageRing.GetPointAroundRadius(360-36, ringCentre);
 
                     var seg = new ArcSegment
                     {
                         SweepDirection = SweepDirection.Counterclockwise,
-                        IsLargeArc = percentageRing.ValueToAngle(percentageRing.Value, 0, 360) > 180,
-                        Size = new Size(middleOfScale, middleOfScale),
-                        Point = percentageRing.ScaleRingPoint(0, middleOfScale)
+                        IsLargeArc = valueAngle < 180.0-(36*2),
+                        Size = new Size(ringCentre, ringCentre),
+
+                        // Sets the end point to an angle, calculated from the value, to a position around the radius of the ring
+                        Point = percentageRing.GetPointAroundRadius(valueAngle+36, ringCentre)
                     };
 
                     pf.Segments.Add(seg);
                     pg.Figures.Add(pf);
 
-                    scaleRing.Data = pg;
-                    scaleRing.StrokeThickness = percentageRing.ScaleThickness;
-
-                    scaleRing.Visibility = Visibility.Visible;
-                    scaleDot.Visibility = Visibility.Collapsed;
+                    trackRing.Data = pg;
+                    trackRing.StrokeThickness = ringThickness;
+                    #endregion
                 }
             }
-
-
         }
+
 
         /// <summary>
         /// Returns the point around the radius of the centre point of the rings
         /// </summary>
-        private Point ScaleRingPoint(double angle, double centrePoint)
+        /// /// <param name="angle">Angle in degrees.</param>
+        /// <param name="centrePoint">Distance from the center to the scaled point.</param>
+        /// <returns>The scaled point coordinates.</returns>
+        private Point GetPointAroundRadius(double angle, double centrePoint)
         {
-            double x = (Radius + (Math.Sin(Degrees2Radians * angle) * centrePoint));
-            double y = (Radius - (Math.Cos(Degrees2Radians * angle) * centrePoint));
+            double AngInRad = (DegToRad * angle);
+
+            double x = (Radius + (Math.Sin(AngInRad) * centrePoint));
+            double y = (Radius - (Math.Cos(AngInRad) * centrePoint));
 
             return new Point(x, y);
         }
@@ -296,61 +256,108 @@ namespace StorageControls
         /// <summary>
         /// Returns an adjusted Radius calculated with the thickness of the trail path
         /// </summary>
-        private double GetTrailRadius(double radius, double trailThickness)
+        private double GetTrackRingRadius(double radius, double trailThickness)
         {
             return (radius - (trailThickness + (trailThickness / 2)));
         }
 
 
-
         /// <summary>
         /// Returns an adjusted Radius calculated with the thickness of the scale path
         /// </summary>
-        private double GetScaleRadius(double radius, double trailThickness)
+        private double GetMainRingRadius(double radius, double trailThickness)
         {
             return (radius - (trailThickness / 2));
         }
 
-
-
-
+       
         /// <summary>
         /// Converts a Value to Angle between minAngle - maxAngle
         /// </summary>
         private double ValueToAngle(double value, double minAngle, double maxAngle)
         {
-            // Off-scale on the left.
-            if (value < Minimum)
+            // If value is below the Minimum set
+            if (value < _minValue)
             {
                 return minAngle;
             }
 
-            // Off-scale on the right.
-            if (value > Maximum)
+            // If value is above the Maximum set
+            if (value > _maxValue)
             {
                 return maxAngle;
             }
 
-            return ((value - Minimum) / (Maximum - Minimum) * (360 - 0)) + 0;
+            return ((value - _minValue) / (_maxValue - _minValue) * (maxAngle - minAngle)) + 0;
         }
 
 
-
+        /// <summary>
+        /// Returns the modulus (remainder) of a number divided by a divider.
+        /// </summary>
         private double Mod(double number, double divider)
         {
+            // This function ensures that the result is
+            // always positive or zero, regardless of the input values.
+
             var result = number % divider;
             result = result < 0 ? result + divider : result;
             return result;
         }
 
 
-
-
-
+        /// <summary>
+        /// Gets the normalized minimum angle.
+        /// </summary>
+        /// <value>The minimum angle in the range from -180 to 180.</value>
+        protected double NormalizedMinAngle => _normalizedMinAngle;
 
 
         /// <summary>
-        /// Updates Normalised Angles
+        /// Gets the normalized maximum angle.
+        /// </summary>
+        /// <value>The maximum angle, in the range from -180 to 540.</value>
+        protected double NormalizedMaxAngle => _normalizedMaxAngle;
+
+
+        /// <summary>
+        /// Gets the Main ring's Thickness
+        /// </summary>
+        private double GetMainRingThickness()
+        {
+            return _mainRingThickness;
+        }
+
+
+        /// <summary>
+        /// Gets the Track ring's Thickness
+        /// </summary>
+        private double GetTrackRingThickness()
+        {
+            return _trackRingThickness;
+        }
+
+
+        /// <summary>
+        /// Gets the controls Maximum value
+        /// </summary>
+        private double GetMaxValue()
+        {
+            return _maxValue;
+        }
+
+
+        /// <summary>
+        /// Gets the controls Minimum value
+        /// </summary>
+        private double GetMinValue()
+        {
+            return _minValue;
+        }
+
+
+        /// <summary>
+        /// Updates normalised angles
         /// </summary>
         private void UpdateNormalizedAngles()
         {
@@ -379,12 +386,6 @@ namespace StorageControls
         }
 
 
-
-
-
-
-
-
         #region RANGEBASE EVENTS
 
         /// <inheritdoc/>
@@ -394,20 +395,33 @@ namespace StorageControls
 
             if (oldValue != newValue)
             {
-                UpdateRings(this);
+                _value = newValue;
+                UpdateAllRings(this);
             }
         }
 
         /// <inheritdoc/>
         protected override void OnMinimumChanged(double oldMinimum, double newMinimum)
         {
-            //base.OnMinimumChanged(oldMinimum, newMinimum);
+            base.OnMinimumChanged(oldMinimum, newMinimum);
+
+            if (oldMinimum != newMinimum)
+            {
+                _minValue = newMinimum;
+                UpdateAllRings(this);
+            }
         }
 
         /// <inheritdoc/>
         protected override void OnMaximumChanged(double oldMaximum, double newMaximum)
         {
-            //base.OnMaximumChanged(oldMaximum, newMaximum);
+            base.OnMaximumChanged(oldMaximum, newMaximum);
+
+            if (oldMaximum != newMaximum)
+            {
+                _maxValue = newMaximum;
+                UpdateAllRings(this);
+            }
         }
 
         #endregion
