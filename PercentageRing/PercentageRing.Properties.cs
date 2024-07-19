@@ -50,7 +50,27 @@ namespace StorageControls
                 nameof(TrackRingThickness),
                 typeof(double),
                 typeof(PercentageRing),
-                new PropertyMetadata(3, OnTrackThicknessChanged));
+                new PropertyMetadata(1, OnTrackThicknessChanged));
+
+        /// <summary>
+        /// Identifies the MainRingPadding dependency property.
+        /// </summary>
+        public static readonly DependencyProperty MainRingPaddingProperty =
+            DependencyProperty.Register(
+                nameof(MainRingPadding),
+                typeof(double),
+                typeof(PercentageRing),
+                new PropertyMetadata(0, OnRingPaddingChanged));
+
+        /// <summary>
+        /// Identifies the TrackRingPadding dependency property.
+        /// </summary>
+        public static readonly DependencyProperty TrackRingPaddingProperty =
+            DependencyProperty.Register(
+                nameof(TrackRingPadding),
+                typeof(double),
+                typeof(PercentageRing),
+                new PropertyMetadata(1, OnTrackPaddingChanged));
 
         /// <summary>
         /// Identifies the ValueAngle dependency property.
@@ -118,6 +138,24 @@ namespace StorageControls
         }
 
         /// <summary>
+        /// Gets or sets the Padding for the Main ring.
+        /// </summary>
+        public double MainRingPadding
+        {
+            get { return (double)GetValue(MainRingPaddingProperty); }
+            set { SetValue(MainRingPaddingProperty, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the Padding for the Track ring.
+        /// </summary>
+        public double TrackRingPadding
+        {
+            get { return (double)GetValue(TrackRingPaddingProperty); }
+            set { SetValue(TrackRingPaddingProperty, value); }
+        }
+
+        /// <summary>
         /// Gets or sets the current angle of the Ring (between MinAngle and MaxAngle). Setting the angle will update the Value.
         /// </summary>
         protected double ValueAngle
@@ -152,6 +190,20 @@ namespace StorageControls
             // Run the code to update Track ring thickness values.
 
             TrackRingThicknessChanged(d, (double)e.NewValue);
+        }
+
+        private static void OnRingPaddingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            // Run the code to update Main ring thickness values.
+
+            MainRingPaddingChanged(d, (double)e.NewValue);
+        }
+
+        private static void OnTrackPaddingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            // Run the code to update Track ring thickness values.
+
+            TrackRingPaddingChanged(d, (double)e.NewValue);
         }
 
         #endregion

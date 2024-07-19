@@ -6,15 +6,15 @@ using Microsoft.UI.Xaml.Shapes;
 namespace StorageControls
 {
     // Template Parts
-    [TemplatePart(Name = TrailPartName, Type = typeof(Path))]
-    [TemplatePart(Name = ScalePartName, Type = typeof(Path))]
+    [TemplatePart(Name = TrackPartName, Type = typeof(Path))]
+    [TemplatePart(Name = MainPartName, Type = typeof(Path))]
     [TemplatePart(Name = CanvasPartName, Type = typeof(Canvas))]
 
     public partial class PercentageRing
     {
         // Path Control Parts
-        internal const string TrailPartName = "PART_TrailPath";
-        internal const string ScalePartName = "PART_ScalePath";
+        internal const string TrackPartName = "PART_TrackPath";
+        internal const string MainPartName = "PART_MainPath";
         internal const string CanvasPartName = "PART_RingCanvas";
     }
 }

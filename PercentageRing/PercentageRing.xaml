@@ -11,6 +11,8 @@
         <Setter Property="Minimum" Value="0" />
         <Setter Property="LargeChange" Value="1" />
         <Setter Property="SmallChange" Value="0.01" />
+        <Setter Property="MainRingPadding" Value="0" />
+        <Setter Property="TrackRingPadding" Value="10" />
         <Setter Property="TrackRingThickness" Value="10" />
         <Setter Property="MainRingThickness" Value="30" />
         <Setter Property="Template">
@@ -20,21 +22,29 @@
                              Height="{TemplateBinding Height}"
                              Stretch="UniformToFill"
                              UseLayoutRounding="True">
+
+                        <!--  Canvas used for the rings  -->
                         <Canvas x:Name="PART_RingCanvas"
                                 Width="160"
                                 Height="160"
                                 Background="Transparent">
-                            <Path x:Name="PART_ScalePath"
+
+                            <!--  Path used for the Main ring  -->
+                            <Path x:Name="PART_MainPath"
                                   Stroke="{ThemeResource AccentFillColorDefaultBrush}"
                                   StrokeEndLineCap="Round"
                                   StrokeLineJoin="Round"
                                   StrokeStartLineCap="Round" />
 
-                            <Path x:Name="PART_TrailPath"
-                                  Stroke="{ThemeResource DividerStrokeColorDefaultBrush}"
+                            <!--  Path used for the Track ring  -->
+                            <Path x:Name="PART_TrackPath"
+                                  Stroke="{ThemeResource ControlStrongStrokeColorDefault}"
                                   StrokeEndLineCap="Round"
                                   StrokeLineJoin="Round"
                                   StrokeStartLineCap="Round" />
+
+
+
                         </Canvas>
                     </Viewbox>
                 </ControlTemplate>

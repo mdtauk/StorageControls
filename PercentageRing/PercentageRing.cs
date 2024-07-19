@@ -21,12 +21,13 @@ namespace StorageControls
         private const double Radius = 80;
         private const double MinAngle = 0;
         private const double MaxAngle = 360;
-        private const double TrackRingSpacingDeg = 9;
-        private const double MainRingSpacingDeg = 36;
 
         // Updatable values
         private double _mainRingThickness;
         private double _trackRingThickness;
+
+        private double _mainRingPadding;
+        private double _trackRingPadding;
 
         private double _minValue; 
         private double _maxValue;
@@ -34,6 +35,8 @@ namespace StorageControls
 
         private double _normalizedMinAngle;
         private double _normalizedMaxAngle;
+
+        private double _spacingAngle;
 
         #endregion
 
@@ -49,6 +52,8 @@ namespace StorageControls
         /// </summary>
         protected override void OnApplyTemplate()
         {
+            UpdateAllRings(this);
+
             base.OnApplyTemplate();
 
             UpdateAllRings(this);
@@ -82,6 +87,43 @@ namespace StorageControls
 
 
         /// <summary>
+        /// Runs when the Main ring Padding property changes
+        /// </summary>
+        private static void MainRingPaddingChanged(DependencyObject d, double newValue)
+        {
+            var percentageRing = (PercentageRing)d;
+
+            percentageRing.UpdateMainRingPadding(newValue);
+
+            UpdateAllRings(d);
+        }
+
+
+        /// <summary>
+        /// Runs when the Track ring Padding property changes
+        /// </summary>
+        private static void TrackRingPaddingChanged(DependencyObject d, double newValue)
+        {
+            var percentageRing = (PercentageRing)d;
+
+            percentageRing.UpdateTrackRingPadding(newValue);
+
+            UpdateAllRings(d);
+        }
+
+
+        /// <summary>
+        /// Runs when the Spacing Angle property changes
+        /// </summary>
+        private static void SpacingAngleChanged(DependencyObject d, double newValue)
+        {
+            var percentageRing = (PercentageRing)d;
+
+            percentageRing.UpdateSpacingAngle(newValue);
+        }
+
+
+        /// <summary>
         /// Updates the private Main ring thickness variable
         /// </summary>
         private void UpdateMainRingThickness(double value)
@@ -100,10 +142,40 @@ namespace StorageControls
 
 
         /// <summary>
+        /// Updates the private Main ring padding variable
+        /// </summary>
+        private void UpdateMainRingPadding(double value)
+        {
+            _mainRingPadding = value;
+        }
+
+
+        /// <summary>
+        /// Updates the private Track ring padding variable
+        /// </summary>
+        private void UpdateTrackRingPadding(double value)
+        {
+            _trackRingPadding = value;
+        }
+
+        /// <summary>
+        /// Updates the private Spacing Angle variable
+        /// </summary>
+        private void UpdateSpacingAngle(double value)
+        {
+            _spacingAngle = value;
+        }
+
+
+        /// <summary>
         /// Update all rings
         /// </summary>
         private static void UpdateAllRings(DependencyObject d)
         {
+            var percentageRing = (PercentageRing)d;
+
+            percentageRing.UpdateSpacingAngle(percentageRing.GetMainRingThickness() / 3);
+
             UpdateMainRing(d);
 
             UpdateTrackRing(d);
@@ -117,7 +189,7 @@ namespace StorageControls
         {
             var percentageRing = (PercentageRing)d;
 
-            var mainRing = percentageRing.GetTemplateChild(ScalePartName) as Path;
+            var mainRing = percentageRing.GetTemplateChild(MainPartName) as Path;
 
             var ringThickness = percentageRing.GetMainRingThickness();
             var valueAngle = percentageRing.ValueToAngle(percentageRing.Value, MinAngle, MaxAngle);
@@ -129,7 +201,40 @@ namespace StorageControls
                 if (percentageRing.Value > percentageRing.GetMinValue() && percentageRing.Value < percentageRing.GetMinValue() + 1)
                 {
                     percentageRing.DrawArc(d, ringCentre, valueAngle, percentageRing.GetMainArcLargeAngleCheck(valueAngle, 0), (MinAngle), (MinAngle + 0.01), mainRing, ringThickness, SweepDirection.Clockwise);
-                    mainRing.StrokeThickness = percentageRing.GetMainRingThickness() * percentageRing.Value;
+                    //mainRing.StrokeThickness = percentageRing.GetMainRingThickness() * percentageRing.Value;
+
+                    #region Code to get the thickness value as the angle changes
+
+                    // Calculate the start angle for thinning
+                    double startThinningAngle = MinAngle;
+
+                    // Calculate the end angle for thinning
+                    double endThinningAngle = MinAngle + 4;
+
+                    // Calculate the current thinning angle
+                    double currentThinningAngle = valueAngle;
+
+                    // Get the initial thickness from the percentage ring
+                    double startThickness = 0;
+
+                    // Set the end thickness to 0
+                    double endThickness = percentageRing.GetMainRingThickness();
+
+                    // Initialize the variable for the current thickness value
+                    double currentThicknessValue;
+
+                    // Ensure currentThinningAngle is within the valid range
+                    currentThinningAngle = Math.Max(startThinningAngle, Math.Min(endThinningAngle, currentThinningAngle));
+
+                    // Calculate the interpolation factor (t) based on the angle range
+                    double t = (currentThinningAngle - startThinningAngle) / (endThinningAngle - startThinningAngle);
+
+                    // Linearly interpolate between startThickness and endThickness
+                    currentThicknessValue = startThickness * (1 - t) + endThickness * t;
+
+                    #endregion
+
+                    mainRing.StrokeThickness = currentThicknessValue;
                 }
                 else if (percentageRing.Value == percentageRing.GetMaxValue())
                 {
@@ -137,7 +242,7 @@ namespace StorageControls
                     var eg = new EllipseGeometry
                     {
                         Center = new Point(Radius, Radius),
-                        RadiusX = percentageRing.GetTrackRingRadius(Radius, percentageRing.GetTrackRingThickness())
+                        RadiusX = percentageRing.GetMainRingRadius(Radius, percentageRing.GetMainRingThickness())
                     };
 
                     eg.RadiusY = eg.RadiusX;
@@ -161,7 +266,7 @@ namespace StorageControls
         {
             var percentageRing = (PercentageRing)d;
 
-            var trackRing = percentageRing.GetTemplateChild(TrailPartName) as Path;
+            var trackRing = percentageRing.GetTemplateChild(TrackPartName) as Path;
 
             var ringThickness = percentageRing.GetTrackRingThickness();
             var valueAngle = percentageRing.ValueToAngle(percentageRing.Value, 0, 360);
@@ -169,7 +274,7 @@ namespace StorageControls
 
             if (trackRing != null)
             {                
-                if (percentageRing.Value > 0 && percentageRing.Value < 1)
+                if (percentageRing.Value > percentageRing.GetMinValue() && percentageRing.Value < percentageRing.GetMinValue() + 1)
                 {
                     //
                     // Start Angle is 360 - 36 for the spacing.
@@ -179,13 +284,12 @@ namespace StorageControls
                     // so a value between 324 and 360 between value 0 and 1
                     //
                     double beginStartAngle = MaxAngle; // Initial start angle
-                    double beginEndAngle = MaxAngle - (MainRingSpacingDeg / 4); // Angle when value = 1
+                    double beginEndAngle = MaxAngle - ((percentageRing.GetSpacingAngle() * 3) / 6); // Angle when value = 1
 
                     double endStartAngle = MinAngle; // Initial start angle
-                    double endEndAngle = MinAngle + (MainRingSpacingDeg / 4); // Angle when value = 1
+                    double endEndAngle = MinAngle + ((percentageRing.GetSpacingAngle() * 3) / 6); // Angle when value = 1
 
-
-                    double adjustStart = (MaxAngle - MainRingSpacingDeg) / valueAngle;
+                    double adjustStart = (MaxAngle - (percentageRing.GetSpacingAngle() * 3)) / valueAngle;
 
                     percentageRing.DrawArc(d, ringCentre, valueAngle, percentageRing.GetTrackArcLargeAngleCheck(valueAngle, 0), GetAdjustedAngle(beginStartAngle, beginEndAngle, valueAngle), GetAdjustedAngle(endStartAngle, endEndAngle, valueAngle), trackRing, ringThickness, SweepDirection.Counterclockwise);
 
@@ -208,26 +312,26 @@ namespace StorageControls
                 }                      
                 else
                 {
-                    if (valueAngle > (MaxAngle - (MainRingSpacingDeg * 2) - 1) && valueAngle < (MaxAngle - (MainRingSpacingDeg * 2) + MainRingSpacingDeg))
+                    if (valueAngle > (MaxAngle - ((percentageRing.GetSpacingAngle() * 3) * 2) - 1) && valueAngle < (MaxAngle - ((percentageRing.GetSpacingAngle() * 3) * 2) + (percentageRing.GetSpacingAngle() * 3)))
                     {
                         // We fix the end and start points as the track reaches its end
-                        percentageRing.DrawArc(d, ringCentre, (MaxAngle - MainRingSpacingDeg), percentageRing.GetTrackArcLargeAngleCheck(valueAngle, MainRingSpacingDeg), (MaxAngle - MainRingSpacingDeg), (MaxAngle - (MainRingSpacingDeg + 1)), trackRing, ringThickness, SweepDirection.Counterclockwise);
+                        percentageRing.DrawArc(d, ringCentre, (MaxAngle - (percentageRing.GetSpacingAngle() * 3)), percentageRing.GetTrackArcLargeAngleCheck(valueAngle, (percentageRing.GetSpacingAngle() * 3)), (MaxAngle - (percentageRing.GetSpacingAngle() * 3)), (MaxAngle - ((percentageRing.GetSpacingAngle() * 3) + 1)), trackRing, ringThickness, SweepDirection.Counterclockwise);
 
                         #region Code to get the thickness value as the angle changes
 
                         // Calculate the start angle for thinning (subtracting 4 from MainRingSpacingDeg)
-                        double startThinningAngle = MaxAngle - (MainRingSpacingDeg - 4);
+                        double startThinningAngle = MaxAngle - ((percentageRing.GetSpacingAngle() * 3) - 4);
 
                         // Calculate the end angle for thinning (based on TrackRingSpacingDeg)
-                        double endThinningAngle = MaxAngle - TrackRingSpacingDeg;
+                        double endThinningAngle = MaxAngle - percentageRing.GetSpacingAngle();
 
                         // Calculate the current thinning angle (adding MainRingSpacingDeg and half of TrackRingSpacingDeg)
-                        double currentThinningAngle = valueAngle + MainRingSpacingDeg + (TrackRingSpacingDeg / 2);
+                        double currentThinningAngle = valueAngle + (percentageRing.GetSpacingAngle() * 3) + (percentageRing.GetSpacingAngle() / 2);
 
                         // Get the initial thickness from the percentage ring
                         double startThickness = percentageRing.GetTrackRingThickness();
 
-                        // Set the end thickness to 0 (assuming thinning means reducing thickness)
+                        // Set the end thickness to 0
                         double endThickness = 0;
 
                         // Initialize the variable for the current thickness value
@@ -246,7 +350,7 @@ namespace StorageControls
 
                         trackRing.StrokeThickness = currentThicknessValue;
                     }
-                    else if (valueAngle > (MaxAngle - (MainRingSpacingDeg * 2) + (TrackRingSpacingDeg * 2) - 1))
+                    else if (valueAngle > (MaxAngle - ((percentageRing.GetSpacingAngle() * 3) * 2) + (percentageRing.GetSpacingAngle() * 2) - 1))
                     {
                         // Hide Track ring when it reaches the end of the available track
                         trackRing.Visibility = Visibility.Collapsed;
@@ -255,7 +359,7 @@ namespace StorageControls
                     {
                         trackRing.Visibility = Visibility.Visible;
 
-                        percentageRing.DrawArc(d, ringCentre, valueAngle, percentageRing.GetTrackArcLargeAngleCheck(valueAngle, MainRingSpacingDeg), (MaxAngle - MainRingSpacingDeg), (valueAngle + MainRingSpacingDeg), trackRing, ringThickness, SweepDirection.Counterclockwise);
+                        percentageRing.DrawArc(d, ringCentre, valueAngle, percentageRing.GetTrackArcLargeAngleCheck(valueAngle, (percentageRing.GetSpacingAngle() * 3)), (MaxAngle - (percentageRing.GetSpacingAngle() * 3)), (valueAngle + (percentageRing.GetSpacingAngle() * 3)), trackRing, ringThickness, SweepDirection.Counterclockwise);
                         trackRing.StrokeThickness = ringThickness;
                     }
                 }
@@ -346,7 +450,7 @@ namespace StorageControls
         /// </summary>
         private double GetTrackRingRadius(double radius, double trailThickness)
         {
-            return (radius - (trailThickness + (trailThickness / 2)));
+            return (radius - (_trackRingPadding + (trailThickness / 2)));
         }
 
 
@@ -355,7 +459,7 @@ namespace StorageControls
         /// </summary>
         private double GetMainRingRadius(double radius, double trailThickness)
         {
-            return (radius - (trailThickness / 2));
+            return (radius - (_mainRingPadding + (trailThickness / 2)));
         }
 
        
@@ -408,6 +512,15 @@ namespace StorageControls
         protected double NormalizedMaxAngle => _normalizedMaxAngle;
 
 
+        /// <summary>
+        /// Gets the spacing angle
+        /// </summary>
+        private double GetSpacingAngle()
+        {
+            return _spacingAngle;
+        }
+        
+        
         /// <summary>
         /// Gets the Main ring's Thickness
         /// </summary>

@@ -10,20 +10,99 @@
     </Window.SystemBackdrop>
 
     <Grid Padding="0,64,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
 
-        <local:PercentageRing x:Name="percentRing"
-                              Width="320"
-                              Height="320"
-                              Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
+        <StackPanel Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="32">
+            <local:PercentageRing x:Name="percentRing"
+                                  Width="320"
+                                  Height="320"
+                                  MainRingPadding="{x:Bind MainPadding.Value, Mode=TwoWay}"
+                                  MainRingThickness="{x:Bind MainThickness.Value, Mode=TwoWay}"
+                                  TrackRingPadding="{x:Bind TrackPadding.Value, Mode=TwoWay}"
+                                  TrackRingThickness="{x:Bind TrackThickness.Value, Mode=TwoWay}"
+                                  Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
+            <local:PercentageRing x:Name="percentRing2"
+                                  Width="16"
+                                  Height="16"
+                                  MainRingPadding="{x:Bind MainPadding.Value, Mode=TwoWay}"
+                                  MainRingThickness="{x:Bind MainThickness.Value, Mode=TwoWay}"
+                                  TrackRingPadding="{x:Bind TrackPadding.Value, Mode=TwoWay}"
+                                  TrackRingThickness="{x:Bind TrackThickness.Value}"
+                                  Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
+            <local:PercentageRing x:Name="percentRing3"
+                                  Width="160"
+                                  Height="160"
+                                  MainRingPadding="{x:Bind MainPadding.Value, Mode=TwoWay}"
+                                  MainRingThickness="{x:Bind MainThickness.Value, Mode=TwoWay}"
+                                  TrackRingPadding="{x:Bind TrackPadding.Value, Mode=TwoWay}"
+                                  TrackRingThickness="{x:Bind TrackThickness.Value}"
+                                  Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
+        </StackPanel>
 
         <Slider x:Name="testSlider"
-                Value="25"
+                Grid.Row="0"
                 Width="480"
                 LargeChange="{x:Bind percentRing.LargeChange}"
                 Maximum="{x:Bind percentRing.Maximum}"
                 Minimum="{x:Bind percentRing.Minimum}"
                 SmallChange="{x:Bind percentRing.SmallChange}"
-                StepFrequency="{x:Bind percentRing.SmallChange}" />
+                StepFrequency="{x:Bind percentRing.SmallChange}"
+                Value="25" />
 
+        <Grid Grid.Row="2"
+              Padding="32,0,32,64"
+              HorizontalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <NumberBox x:Name="TrackThickness"
+                       Grid.Column="0"
+                       Margin="16,0"
+                       Header="Track Thickness"
+                       Maximum="40"
+                       Minimum="1"
+                       SpinButtonPlacementMode="Inline"
+                       Value="10" />
+
+            <NumberBox x:Name="MainThickness"
+                       Grid.Column="1"
+                       Margin="16,0"
+                       Header="Main Thickness"
+                       Maximum="40"
+                       Minimum="1"
+                       SpinButtonPlacementMode="Inline"
+                       Value="30" />
+
+            <NumberBox x:Name="TrackPadding"
+                       Grid.Column="3"
+                       Margin="16,0"
+                       Header="Track Padding"
+                       Maximum="40"
+                       Minimum="0"
+                       SpinButtonPlacementMode="Inline"
+                       Value="10" />
+
+            <NumberBox x:Name="MainPadding"
+                       Grid.Column="4"
+                       Margin="16,0"
+                       Header="Main Padding"
+                       Maximum="40"
+                       Minimum="0"
+                       SpinButtonPlacementMode="Inline"
+                       Value="0" />
+        </Grid>
     </Grid>
 </Window>
