@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Shapes;
+using Microsoft.UI.Xaml.Media.Animation;
 using System;
 using Windows.Foundation;
 using Windows.Security.Cryptography.Core;
@@ -32,6 +33,7 @@ namespace StorageControls
         private double _minValue; 
         private double _maxValue;
         private double _value;
+        private double _oldValue;
 
         private double _normalizedMinAngle;
         private double _normalizedMaxAngle;
@@ -193,6 +195,7 @@ namespace StorageControls
 
             var ringThickness = percentageRing.GetMainRingThickness();
             var valueAngle = percentageRing.ValueToAngle(percentageRing.Value, MinAngle, MaxAngle);
+            var oldValueAngle = percentageRing.ValueToAngle(percentageRing.GetOldValue(), MinAngle, MaxAngle);
             var ringCentre = percentageRing.GetMainRingRadius(Radius, percentageRing.GetMainRingThickness());
 
             if (mainRing != null)
@@ -200,7 +203,7 @@ namespace StorageControls
                 // Between the min value and min value + 1
                 if (percentageRing.Value > percentageRing.GetMinValue() && percentageRing.Value < percentageRing.GetMinValue() + 1)
                 {
-                    percentageRing.DrawArc(d, ringCentre, valueAngle, percentageRing.GetMainArcLargeAngleCheck(valueAngle, 0), (MinAngle), (MinAngle + 0.01), mainRing, ringThickness, SweepDirection.Clockwise);
+                    percentageRing.DrawArc(d, ringCentre, valueAngle, oldValueAngle, percentageRing.GetMainArcLargeAngleCheck(valueAngle, 0), (MinAngle), (MinAngle + 0.01), mainRing, ringThickness, SweepDirection.Clockwise);
                     //mainRing.StrokeThickness = percentageRing.GetMainRingThickness() * percentageRing.Value;
 
                     #region Code to get the thickness value as the angle changes
@@ -252,7 +255,7 @@ namespace StorageControls
                 }
                 else
                 {
-                    percentageRing.DrawArc(d, ringCentre, valueAngle, percentageRing.GetMainArcLargeAngleCheck(valueAngle, 0), 0, valueAngle, mainRing, ringThickness, SweepDirection.Clockwise);
+                    percentageRing.DrawArc(d, ringCentre, valueAngle, oldValueAngle, percentageRing.GetMainArcLargeAngleCheck(valueAngle, 0), 0, valueAngle, mainRing, ringThickness, SweepDirection.Clockwise);
                     mainRing.StrokeThickness = ringThickness;
                 }
             }
@@ -269,7 +272,8 @@ namespace StorageControls
             var trackRing = percentageRing.GetTemplateChild(TrackPartName) as Path;
 
             var ringThickness = percentageRing.GetTrackRingThickness();
-            var valueAngle = percentageRing.ValueToAngle(percentageRing.Value, 0, 360);
+            var valueAngle = percentageRing.ValueToAngle(percentageRing.Value, MinAngle, MaxAngle);
+            var oldValueAngle = percentageRing.ValueToAngle(percentageRing.GetOldValue(), MinAngle, MaxAngle);
             var ringCentre = percentageRing.GetTrackRingRadius(Radius, percentageRing.GetTrackRingThickness());
 
             if (trackRing != null)
@@ -291,7 +295,7 @@ namespace StorageControls
 
                     double adjustStart = (MaxAngle - (percentageRing.GetSpacingAngle() * 3)) / valueAngle;
 
-                    percentageRing.DrawArc(d, ringCentre, valueAngle, percentageRing.GetTrackArcLargeAngleCheck(valueAngle, 0), GetAdjustedAngle(beginStartAngle, beginEndAngle, valueAngle), GetAdjustedAngle(endStartAngle, endEndAngle, valueAngle), trackRing, ringThickness, SweepDirection.Counterclockwise);
+                    percentageRing.DrawArc(d, ringCentre, valueAngle, oldValueAngle, percentageRing.GetTrackArcLargeAngleCheck(valueAngle, 0), GetAdjustedAngle(beginStartAngle, beginEndAngle, valueAngle), GetAdjustedAngle(endStartAngle, endEndAngle, valueAngle), trackRing, ringThickness, SweepDirection.Counterclockwise);
 
                     trackRing.StrokeThickness = ringThickness;
                     trackRing.Visibility = Visibility.Visible;
@@ -315,7 +319,7 @@ namespace StorageControls
                     if (valueAngle > (MaxAngle - ((percentageRing.GetSpacingAngle() * 3) * 2) - 1) && valueAngle < (MaxAngle - ((percentageRing.GetSpacingAngle() * 3) * 2) + (percentageRing.GetSpacingAngle() * 3)))
                     {
                         // We fix the end and start points as the track reaches its end
-                        percentageRing.DrawArc(d, ringCentre, (MaxAngle - (percentageRing.GetSpacingAngle() * 3)), percentageRing.GetTrackArcLargeAngleCheck(valueAngle, (percentageRing.GetSpacingAngle() * 3)), (MaxAngle - (percentageRing.GetSpacingAngle() * 3)), (MaxAngle - ((percentageRing.GetSpacingAngle() * 3) + 1)), trackRing, ringThickness, SweepDirection.Counterclockwise);
+                        percentageRing.DrawArc(d, ringCentre, (MaxAngle - (percentageRing.GetSpacingAngle() * 3)), oldValueAngle, percentageRing.GetTrackArcLargeAngleCheck(valueAngle, (percentageRing.GetSpacingAngle() * 3)), (MaxAngle - (percentageRing.GetSpacingAngle() * 3)), (MaxAngle - ((percentageRing.GetSpacingAngle() * 3) + 1)), trackRing, ringThickness, SweepDirection.Counterclockwise);
 
                         #region Code to get the thickness value as the angle changes
 
@@ -359,7 +363,7 @@ namespace StorageControls
                     {
                         trackRing.Visibility = Visibility.Visible;
 
-                        percentageRing.DrawArc(d, ringCentre, valueAngle, percentageRing.GetTrackArcLargeAngleCheck(valueAngle, (percentageRing.GetSpacingAngle() * 3)), (MaxAngle - (percentageRing.GetSpacingAngle() * 3)), (valueAngle + (percentageRing.GetSpacingAngle() * 3)), trackRing, ringThickness, SweepDirection.Counterclockwise);
+                        percentageRing.DrawArc(d, ringCentre, valueAngle, oldValueAngle, percentageRing.GetTrackArcLargeAngleCheck(valueAngle, (percentageRing.GetSpacingAngle() * 3)), (MaxAngle - (percentageRing.GetSpacingAngle() * 3)), (valueAngle + (percentageRing.GetSpacingAngle() * 3)), trackRing, ringThickness, SweepDirection.Counterclockwise);
                         trackRing.StrokeThickness = ringThickness;
                     }
                 }
@@ -373,13 +377,14 @@ namespace StorageControls
         /// <param name="d">The DependencyObject representing the PercentageRing.</param>
         /// <param name="ringCentre">The center point of the ring.</param>
         /// <param name="valueAngle">The angle corresponding to the percentage value (in degrees).</param>
+        /// <param name="oldValueAngle">The previous angle corresponding to the percentage value (in degrees).</param>
         /// <param name="largeArcAngle">A boolean indicating whether the arc is a large arc.</param>
         /// <param name="startAngle">The starting angle of the arc (in degrees).</param>
         /// <param name="endAngle">The ending angle of the arc (in degrees).</param>
         /// <param name="ringPath">The Path control used to display the arc.</param>
         /// <param name="ringThickness">The stroke thickness of the arc.</param>
         /// <param name="sweep">The direction in which the arc sweeps (Clockwise or Counterclockwise).</param>
-        private void DrawArc(DependencyObject d, double ringCentre, double valueAngle, bool largeArcAngle, double startAngle, double endAngle, Path ringPath, double ringThickness, SweepDirection sweep)
+        private void DrawArc(DependencyObject d, double ringCentre, double valueAngle, double oldValueAngle, bool largeArcAngle, double startAngle, double endAngle, Path ringPath, double ringThickness, SweepDirection sweep)
         {
             var percentageRing = (PercentageRing)d;
 
@@ -397,10 +402,22 @@ namespace StorageControls
                 SweepDirection = sweep,
                 IsLargeArc = largeArcAngle,
                 Size = new Size(ringCentre, ringCentre),
-
                 // Sets the end point to an angle, calculated from the value, to a position around the radius of the ring
                 Point = percentageRing.GetPointAroundRadius(endAngle, ringCentre)
             };
+
+            // TODO
+            // Setup animation of the point.
+
+            PointAnimation pointAnim = new PointAnimation();
+            pointAnim.Duration = new Duration(new TimeSpan(0, 0, 0, 3, 0));
+            Storyboard storyBoard = new Storyboard();
+            storyBoard.Children.Add(pointAnim);
+            Storyboard.SetTarget(pointAnim, ringPath);
+            //Storyboard.SetTargetProperty(pointAnim, MainPartName);
+            pointAnim.From = percentageRing.GetPointAroundRadius(oldValueAngle, ringCentre);
+            pointAnim.To = percentageRing.GetPointAroundRadius(endAngle, ringCentre); 
+            //storyBoard.Begin();
 
             pf.Segments.Add(seg);
             pg.Figures.Add(pf);
@@ -513,6 +530,15 @@ namespace StorageControls
 
 
         /// <summary>
+        /// Gets the old value
+        /// </summary>
+        private double GetOldValue()
+        {
+            return _oldValue;
+        }
+
+
+        /// <summary>
         /// Gets the spacing angle
         /// </summary>
         private double GetSpacingAngle()
@@ -597,6 +623,8 @@ namespace StorageControls
             if (oldValue != newValue)
             {
                 _value = newValue;
+                _oldValue = oldValue;
+
                 UpdateAllRings(this);
             }
         }

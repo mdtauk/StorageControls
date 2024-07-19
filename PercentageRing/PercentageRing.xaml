@@ -28,20 +28,35 @@
                                 Width="160"
                                 Height="160"
                                 Background="Transparent">
+                            <Canvas.Resources>
+                                <Storyboard x:Name="UpdateValueAnimation" />
+                            </Canvas.Resources>
 
                             <!--  Path used for the Main ring  -->
                             <Path x:Name="PART_MainPath"
                                   Stroke="{ThemeResource AccentFillColorDefaultBrush}"
                                   StrokeEndLineCap="Round"
                                   StrokeLineJoin="Round"
-                                  StrokeStartLineCap="Round" />
+                                  StrokeStartLineCap="Round">
+                                <Path.Data>
+                                    <PathGeometry x:Name="MainPathGeometry">
+                                        <PathFigure x:Name="MainPathFigure" />
+                                    </PathGeometry>
+                                </Path.Data>
+                            </Path>
 
                             <!--  Path used for the Track ring  -->
                             <Path x:Name="PART_TrackPath"
                                   Stroke="{ThemeResource ControlStrongStrokeColorDefault}"
                                   StrokeEndLineCap="Round"
                                   StrokeLineJoin="Round"
-                                  StrokeStartLineCap="Round" />
+                                  StrokeStartLineCap="Round">
+                                <Path.Data>
+                                    <PathGeometry x:Name="TrackPathGeometry">
+                                        <PathFigure x:Name="TrackPathFigure" />
+                                    </PathGeometry>
+                                </Path.Data>
+                            </Path>
 
 
 
