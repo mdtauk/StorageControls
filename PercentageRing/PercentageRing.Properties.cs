@@ -73,16 +73,6 @@ namespace StorageControls
                 new PropertyMetadata(1, OnTrackPaddingChanged));
 
         /// <summary>
-        /// Identifies the ValueAngle dependency property.
-        /// </summary>
-        protected static readonly DependencyProperty ValueAngleProperty =
-            DependencyProperty.Register(
-                nameof(ValueAngle), 
-                typeof(double), 
-                typeof(PercentageRing), 
-                new PropertyMetadata(null));
-
-        /// <summary>
         /// Identifies the Percent dependency property.
         /// </summary>
         protected static readonly DependencyProperty PercentProperty =
@@ -91,6 +81,17 @@ namespace StorageControls
                 typeof(string),
                 typeof(PercentageRing),
                 new PropertyMetadata(string.Empty));
+
+
+        /// <summary>
+        /// Identifies the AdjustedSize dependency property.
+        /// </summary>
+        protected static readonly DependencyProperty AdjustedSizeProperty =
+            DependencyProperty.Register(
+                nameof(AdjustedSize),
+                typeof(double),
+                typeof(PercentageRing),
+                new PropertyMetadata(16));
 
         #endregion
 
@@ -156,21 +157,21 @@ namespace StorageControls
         }
 
         /// <summary>
-        /// Gets or sets the current angle of the Ring (between MinAngle and MaxAngle). Setting the angle will update the Value.
-        /// </summary>
-        protected double ValueAngle
-        {
-            get { return (double)GetValue(ValueAngleProperty); }
-            set { SetValue(ValueAngleProperty, value); }
-        }
-
-        /// <summary>
         /// Gets or sets the current value converted to Percentage.
         /// </summary>
         protected double Percent
         {
             get { return (double)GetValue(PercentProperty); }
             set { SetValue(PercentProperty, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the Adjusted Size of the control container.
+        /// </summary>
+        protected double AdjustedSize
+        {
+            get { return (double)GetValue(AdjustedSizeProperty); }
+            set { SetValue(AdjustedSizeProperty, value); }
         }
 
         #endregion

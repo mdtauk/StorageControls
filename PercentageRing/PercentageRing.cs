@@ -23,7 +23,7 @@ namespace StorageControls
         private const double MinAngle = 0;
         private const double MaxAngle = 360;
 
-        // Updatable values
+        // Private values
         private double _mainRingThickness;
         private double _trackRingThickness;
 
@@ -53,7 +53,7 @@ namespace StorageControls
         /// Update the visual state of the control when its template is changed.
         /// </summary>
         protected override void OnApplyTemplate()
-        {
+        {            
             UpdateAllRings(this);
 
             base.OnApplyTemplate();
@@ -203,7 +203,17 @@ namespace StorageControls
                 // Between the min value and min value + 1
                 if (percentageRing.Value > percentageRing.GetMinValue() && percentageRing.Value < percentageRing.GetMinValue() + 1)
                 {
-                    percentageRing.DrawArc(d, ringCentre, valueAngle, oldValueAngle, percentageRing.GetMainArcLargeAngleCheck(valueAngle, 0), (MinAngle), (MinAngle + 0.01), mainRing, ringThickness, SweepDirection.Clockwise);
+                    percentageRing.DrawArc(
+                        d, 
+                        ringCentre, 
+                        valueAngle, 
+                        oldValueAngle, 
+                        percentageRing.GetMainArcLargeAngleCheck(valueAngle, 0), 
+                        (MinAngle), 
+                        (MinAngle + 0.01), 
+                        mainRing, 
+                        ringThickness, 
+                        SweepDirection.Clockwise);
                     //mainRing.StrokeThickness = percentageRing.GetMainRingThickness() * percentageRing.Value;
 
                     #region Code to get the thickness value as the angle changes
@@ -255,7 +265,17 @@ namespace StorageControls
                 }
                 else
                 {
-                    percentageRing.DrawArc(d, ringCentre, valueAngle, oldValueAngle, percentageRing.GetMainArcLargeAngleCheck(valueAngle, 0), 0, valueAngle, mainRing, ringThickness, SweepDirection.Clockwise);
+                    percentageRing.DrawArc(
+                        d, 
+                        ringCentre, 
+                        valueAngle, 
+                        oldValueAngle, 
+                        percentageRing.GetMainArcLargeAngleCheck(valueAngle, 0), 
+                        0, 
+                        valueAngle, 
+                        mainRing, 
+                        ringThickness, 
+                        SweepDirection.Clockwise);
                     mainRing.StrokeThickness = ringThickness;
                 }
             }
@@ -295,7 +315,17 @@ namespace StorageControls
 
                     double adjustStart = (MaxAngle - (percentageRing.GetSpacingAngle() * 3)) / valueAngle;
 
-                    percentageRing.DrawArc(d, ringCentre, valueAngle, oldValueAngle, percentageRing.GetTrackArcLargeAngleCheck(valueAngle, 0), GetAdjustedAngle(beginStartAngle, beginEndAngle, valueAngle), GetAdjustedAngle(endStartAngle, endEndAngle, valueAngle), trackRing, ringThickness, SweepDirection.Counterclockwise);
+                    percentageRing.DrawArc(
+                        d, 
+                        ringCentre, 
+                        valueAngle, 
+                        oldValueAngle, 
+                        percentageRing.GetTrackArcLargeAngleCheck(valueAngle, 0), 
+                        GetAdjustedAngle(beginStartAngle, beginEndAngle, valueAngle), 
+                        GetAdjustedAngle(endStartAngle, endEndAngle, valueAngle), 
+                        trackRing, 
+                        ringThickness, 
+                        SweepDirection.Counterclockwise);
 
                     trackRing.StrokeThickness = ringThickness;
                     trackRing.Visibility = Visibility.Visible;
@@ -363,7 +393,16 @@ namespace StorageControls
                     {
                         trackRing.Visibility = Visibility.Visible;
 
-                        percentageRing.DrawArc(d, ringCentre, valueAngle, oldValueAngle, percentageRing.GetTrackArcLargeAngleCheck(valueAngle, (percentageRing.GetSpacingAngle() * 3)), (MaxAngle - (percentageRing.GetSpacingAngle() * 3)), (valueAngle + (percentageRing.GetSpacingAngle() * 3)), trackRing, ringThickness, SweepDirection.Counterclockwise);
+                        percentageRing.DrawArc(
+                            d, 
+                            ringCentre, 
+                            valueAngle, 
+                            oldValueAngle, 
+                            percentageRing.GetTrackArcLargeAngleCheck(valueAngle, (percentageRing.GetSpacingAngle() * 3)), 
+                            (MaxAngle - (percentageRing.GetSpacingAngle() * 3)), (valueAngle + (percentageRing.GetSpacingAngle() * 3)), 
+                            trackRing, 
+                            ringThickness, 
+                            SweepDirection.Counterclockwise);
                         trackRing.StrokeThickness = ringThickness;
                     }
                 }
@@ -405,19 +444,6 @@ namespace StorageControls
                 // Sets the end point to an angle, calculated from the value, to a position around the radius of the ring
                 Point = percentageRing.GetPointAroundRadius(endAngle, ringCentre)
             };
-
-            // TODO
-            // Setup animation of the point.
-
-            PointAnimation pointAnim = new PointAnimation();
-            pointAnim.Duration = new Duration(new TimeSpan(0, 0, 0, 3, 0));
-            Storyboard storyBoard = new Storyboard();
-            storyBoard.Children.Add(pointAnim);
-            Storyboard.SetTarget(pointAnim, ringPath);
-            //Storyboard.SetTargetProperty(pointAnim, MainPartName);
-            pointAnim.From = percentageRing.GetPointAroundRadius(oldValueAngle, ringCentre);
-            pointAnim.To = percentageRing.GetPointAroundRadius(endAngle, ringCentre); 
-            //storyBoard.Begin();
 
             pf.Segments.Add(seg);
             pg.Figures.Add(pf);
@@ -479,9 +505,9 @@ namespace StorageControls
             return (radius - (_mainRingPadding + (trailThickness / 2)));
         }
 
-       
+
         /// <summary>
-        /// Converts a Value to Angle between minAngle - maxAngle
+        /// Converts a numeric value within a specified range to an angle between a minimum angle and a maximum.
         /// </summary>
         private double ValueToAngle(double value, double minAngle, double maxAngle)
         {
@@ -497,7 +523,7 @@ namespace StorageControls
                 return maxAngle;
             }
 
-            return ((value - _minValue) / (_maxValue - _minValue) * (maxAngle - minAngle)) + 0;
+            return ((value - _minValue) / (_maxValue - _minValue) * (maxAngle - minAngle));
         }
 
 
@@ -654,5 +680,6 @@ namespace StorageControls
         }
 
         #endregion
+
     }
 }
