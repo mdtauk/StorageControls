@@ -488,17 +488,6 @@ namespace StorageControls
                 var ringThickness = pRing.MainRingThickness;
                 var containerCentre = pRing.GetContainerCenter();
 
-                //double size;
-
-                //if (pRing.CheckMainIsThickest())
-                //{
-                //    size = containerCentre - (pRing.GetLargerThickness() / 2);
-                //}
-                //else
-                //{
-                //    size = containerCentre - (pRing.GetSmallerThickness() / 2);
-                //}
-
                 var radius = pRing.GetSharedRadius();
                 var gapAngle = pRing.GetGapAngle();
                 var centre = new Point(containerCentre, containerCentre);
