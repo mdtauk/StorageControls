@@ -21,7 +21,7 @@
                     Orientation="Horizontal"
                     Spacing="32">
             <local:PercentageRingTwo Width="240"
-                                     Height="{x:Bind HeightTest.Value, Mode=TwoWay}"
+                                     Height="{x:Bind HeightTest.Value, Mode=OneWay}"
                                      MainRingThickness="{x:Bind MainThickness.Value, Mode=TwoWay}"
                                      TrackRingThickness="{x:Bind TrackThickness.Value, Mode=TwoWay}"
                                      Maximum="90"
@@ -73,8 +73,8 @@
                            Grid.Column="0"
                            Margin="16,0"
                            Header="Height"
-                           Maximum="400"
-                           Minimum="64"
+                           Maximum="320"
+                           Minimum="16"
                            SpinButtonPlacementMode="Inline"
                            Value="128" />
 

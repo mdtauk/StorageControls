@@ -31,7 +31,7 @@ namespace StorageControls
                 nameof(MainRingThickness),
                 typeof(double),
                 typeof(PercentageRingTwo),
-                new PropertyMetadata(3.0, OnMainRingThicknessChanged));
+                new PropertyMetadata(3.0, OnRingThicknessChanged));
 
         /// <summary>
         /// Identifies the TrackRingThickness dependency property.
@@ -41,7 +41,7 @@ namespace StorageControls
                 nameof(TrackRingThickness),
                 typeof(double),
                 typeof(PercentageRingTwo),
-                new PropertyMetadata(1.0, OnTrackThicknessChanged));
+                new PropertyMetadata(1.0, OnRingThicknessChanged));
 
         /// <summary>
         /// Identifies the Value dependency property.
@@ -111,11 +111,6 @@ namespace StorageControls
 
 
         #region Public Properties
-        #endregion
-
-
-
-        #region Protected Properties
 
         //
         // Brushes
@@ -169,6 +164,12 @@ namespace StorageControls
             set { SetValue(MaximumProperty, value); }
         }
 
+        #endregion
+
+
+
+        #region Protected Properties        
+
         /// <summary>
         /// Gets or sets the current angle of the Ring (between MinAngle and MaxAngle).
         /// </summary>
@@ -208,22 +209,11 @@ namespace StorageControls
         /// <summary>
         /// Fires when Main Ring Thickness property changes
         /// </summary>
-        private static void OnMainRingThicknessChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnRingThicknessChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (e.OldValue != e.NewValue)
             {
-                MainRingThicknessChanged(d, (double)e.NewValue);
-            }
-        }
-
-        /// <summary>
-        /// Fires when Track Ring Thickness property changes
-        /// </summary>
-        private static void OnTrackThicknessChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (e.OldValue != e.NewValue)
-            {
-                TrackRingThicknessChanged(d, (double)e.NewValue);
+                RingThicknessChanged(d, (double)e.NewValue);
             }
         }
         
@@ -249,8 +239,6 @@ namespace StorageControls
             if (e.OldValue != e.NewValue)
             {
                 var pRing = d as PercentageRingTwo;
-
-                pRing.SetMinimumValue((double)e.NewValue);
             }
         }
 
@@ -263,8 +251,6 @@ namespace StorageControls
             if (e.OldValue != e.NewValue)
             {
                 var pRing = d as PercentageRingTwo;
-
-                pRing.SetMaximumValue((double)e.NewValue);
             }
         }
 

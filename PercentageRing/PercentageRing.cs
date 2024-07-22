@@ -54,7 +54,7 @@ namespace StorageControls
         /// </summary>
         protected override void OnApplyTemplate()
         {            
-            UpdateAllRings(this);
+            //UpdateAllRings(this);
 
             base.OnApplyTemplate();
 
