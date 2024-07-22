@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Shapes;
 using System;
 using System.Net;
 using Windows.Foundation;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace StorageControls
 {
@@ -285,7 +286,7 @@ namespace StorageControls
 
             SetSharedRadius(GetContainerSize(), GetLargerThickness());
 
-            SetGapAngle(GapThicknessToAngle(GetLargerThickness(), GetSmallerThickness(), GetContainerSize()));
+            //SetGapAngle(GapThicknessToAngle(GetLargerThickness(), GetSharedRadius()));
 
             // Update protected dependency properties
             ValueAngle = DoubleToAngle(Value, Minimum, Maximum, MinAngle, MaxAngle);
@@ -351,11 +352,12 @@ namespace StorageControls
 
             SetSharedRadius(GetContainerSize(), GetLargerThickness());
 
-            SetGapAngle(GapThicknessToAngle(GetLargerThickness(), GetSmallerThickness(), GetContainerSize()));
+            double angle = GapThicknessToAngle(GetSharedRadius(), GetLargerThickness() / 1.5);
+            SetGapAngle(angle);
 
             if (pRing._testText != null)
             {
-               pRing._testText.Text = Math.Round(pRing.Value, 2) + " " + pRing.Percent + System.Environment.NewLine + "gapAngle: " + pRing.GetGapAngle();
+               //pRing._testText.Text = Math.Round(pRing.Value, 2) + " " + pRing.Percent + System.Environment.NewLine + "gapAngle: " + pRing.GetGapAngle() + System.Environment.NewLine + "radius: " + pRing.GetSharedRadius() + System.Environment.NewLine + "thickness: " + pRing.GetLargerThickness();
             }
 
             DrawAllRings(pRing, useTransition);
@@ -452,8 +454,6 @@ namespace StorageControls
                 pRing.SetLargerThickness(pRing.MainRingThickness);
                 pRing.SetSmallerThickness(pRing.TrackRingThickness);
             }
-
-            pRing.SetGapAngle(pRing.GapThicknessToAngle(pRing.GetLargerThickness(), pRing.GetSmallerThickness(), pRing.GetContainerSize()));
             pRing.UpdateLayout(d, false);
         }
 
@@ -636,28 +636,56 @@ namespace StorageControls
                     path.StrokeThickness = 0;
 
                     path.Opacity = 1;
-                }
+                }                
                 //
                 // For any value between Minimum and Maximum
                 else
                 {
-                    var startPoint = pRing.GetPointAroundRadius(-gapAngle, radius, containerCentre);
+                    var startPoint = pRing.GetPointAroundRadius(MinAngle - gapAngle, radius, containerCentre);
                     var endPoint = pRing.GetPointAroundRadius(pRing.ValueAngle + gapAngle, radius, containerCentre);
 
-                    pRing.DrawArc(
-                        d,
-                        path,
-                        startPoint,
-                        endPoint,
-                        new Size(size, size),
-                        pRing.CheckTrackArcLargeAngle(pRing.ValueAngle, gapAngle),
-                        SweepDirection.Counterclockwise,
-                        gapAngle);
+                    //
+                    // Special condition where the value approaches the end of the track
+                    if (pRing.ValueAngle > (MaxAngle - (gapAngle * 2)))
+                    {
+                        var endPoint2 = pRing.GetPointAroundRadius((MaxAngle - gapAngle) - 0.1, radius, containerCentre);
 
-                    path.Stroke = new SolidColorBrush(Microsoft.UI.Colors.Black);
-                    path.StrokeThickness = ringThickness;
+                        pRing.DrawArc(
+                            d,
+                            path,
+                            startPoint,
+                            endPoint2,
+                            new Size(size, size),
+                            pRing.CheckTrackArcLargeAngle(pRing.ValueAngle, gapAngle),
+                            SweepDirection.Counterclockwise,
+                            gapAngle);
 
-                    path.Opacity = 1;
+                        path.Stroke = new SolidColorBrush(Microsoft.UI.Colors.LightPink);
+                        path.StrokeThickness = pRing.DrawThicknessTransition(d, (MaxAngle - (gapAngle * 2)), pRing.ValueAngle, (MaxAngle - gapAngle), ringThickness, 0.0, true);
+                    }
+                    else if (pRing.ValueAngle > (MaxAngle - gapAngle))
+                    {
+                        // Hide Track ring when it reaches the end of the available track
+                        path.Visibility = Visibility.Collapsed;
+                    }
+                    else
+                    {
+                        pRing.DrawArc(
+                            d,
+                            path,
+                            startPoint,
+                            endPoint,
+                            new Size(size, size),
+                            pRing.CheckTrackArcLargeAngle(pRing.ValueAngle, gapAngle),
+                            SweepDirection.Counterclockwise,
+                            gapAngle);
+
+                        path.Stroke = new SolidColorBrush(Microsoft.UI.Colors.Gray);
+                        path.StrokeThickness = ringThickness;
+
+                        path.Visibility = Visibility.Visible;
+                    }
+                    
                 }
             }
         }
@@ -920,43 +948,18 @@ namespace StorageControls
         /// <param name="thicknessB">The second thickness compare.</param>
         /// <param name="radius">The radius of the circle.</param>
         /// <returns>The gap angle (sum of angles for the larger and smaller strokes).</returns>
-        private double GapThicknessToAngle(double largerThickness, double smallerThickness, double radius)
+        private double GapThicknessToAngle(double radius, double thickness)
         {
-            if (!double.IsNaN(largerThickness) || !double.IsNaN(smallerThickness) && !double.IsNaN(radius))
+            if (radius > 0 && thickness > 0)
             {
-                // Calculate the percentage of largerThickness relative to the radius
-                var largerPercentage = largerThickness / radius * 100;
+                // Calculate the maximum number of circles
+                double n = Math.PI * (radius / thickness);
 
-                double largerAngle;
+                // Calculate the angle between each small circle
+                double angle = 360.0 / n;
 
-                // Convert the percentage to an angle within the specified range
-                if (largerPercentage > 80)
-                {
-                    largerAngle = DoubleToAngle(80, Minimum, Maximum, MinAngle, MaxAngle);
-                }
-                else
-                {
-                    largerAngle = DoubleToAngle(largerPercentage, Minimum, Maximum, MinAngle, MaxAngle);
-                }
-
-                // Calculate the percentage of largerThickness relative to the radius
-                var smallerPercentage = smallerThickness / radius * 100;
-
-                double smallerAngle;
-
-                // Convert the percentage to an angle within the specified range
-                if (smallerPercentage > 80)
-                {
-                    smallerAngle = DoubleToAngle(80, Minimum, Maximum, MinAngle, MaxAngle);
-                }
-                else
-                {
-                    smallerAngle = DoubleToAngle(smallerPercentage, Minimum, Maximum, MinAngle, MaxAngle);
-                }
-
-                return largerAngle;
-            }
-
+                return angle;
+            }            
             return 0;
         }
 
@@ -1003,7 +1006,7 @@ namespace StorageControls
         /// <returns>A boolean True if the angle is less than 180 degrees - minus two times the gapAngle</returns>
         private bool CheckTrackArcLargeAngle(double angle, double gapAngle)
         {
-            return angle < 180.0 - (gapAngle * 2);
+            return angle + (gapAngle * 2) < 180.0;
         }
 
 
@@ -1015,9 +1018,9 @@ namespace StorageControls
         /// <param name="endAngle">The final angle.</param>
         /// <param name="valueAngle">A value between 0 and 1 representing the interpolation factor.</param>
         /// <returns>The adjusted angle based on linear interpolation.</returns>
-        private static double GetAdjustedAngle(double startAngle, double endAngle, double valueAngle)
+        private static double GetInterpolatedAngle(double startAngle, double endAngle, double valueAngle)
         {
-            // Linear interpolation formula (lerp): GetAdjustedAngle = (startAngle + valueAngle) * (endAngle - startAngle)
+            // Linear interpolation formula (lerp): GetInterpolatedAngle = (startAngle + valueAngle) * (endAngle - startAngle)
             return (startAngle + valueAngle) * (endAngle - startAngle);
         }
 

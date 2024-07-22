@@ -454,7 +454,7 @@ namespace StorageControls
 
         static double GetAdjustedAngle(double startAngle, double endAngle, double valueAngle)
         {
-            // Linear interpolation formula (lerp): GetAdjustedAngle = startAngle + valueAngle * (endAngle - startAngle)
+            // Linear interpolation formula (lerp): GetInterpolatedAngle = startAngle + valueAngle * (endAngle - startAngle)
             return startAngle + valueAngle * (endAngle - startAngle);
         }
 
