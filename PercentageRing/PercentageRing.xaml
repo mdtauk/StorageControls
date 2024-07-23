@@ -5,63 +5,55 @@
     <Style BasedOn="{StaticResource DefaultPercentageRingStyle}" TargetType="local:PercentageRing" />
 
     <Style x:Key="DefaultPercentageRingStyle" TargetType="local:PercentageRing">
-        <Setter Property="Width" Value="160" />
-        <Setter Property="Height" Value="160" />
-        <Setter Property="Maximum" Value="100" />
+        <Setter Property="Value" Value="25" />
         <Setter Property="Minimum" Value="0" />
-        <Setter Property="LargeChange" Value="1" />
-        <Setter Property="SmallChange" Value="0.01" />
-        <Setter Property="MainRingPadding" Value="0" />
-        <Setter Property="TrackRingPadding" Value="10" />
-        <Setter Property="TrackRingThickness" Value="10" />
-        <Setter Property="MainRingThickness" Value="30" />
+        <Setter Property="Maximum" Value="100" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Height" Value="16" />
+        <Setter Property="Width" Value="16" />
+        <Setter Property="MainRingBrush" Value="{ThemeResource AccentFillColorDefaultBrush}" />
+        <Setter Property="TrackRingBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}" />
+        <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
+        <Setter Property="MainRingThickness" Value="3" />
+        <Setter Property="TrackRingThickness" Value="1" />
+        <Setter Property="MainRingStartCap" Value="Round" />
+        <Setter Property="MainRingEndCap" Value="Round" />
+        <Setter Property="TrackRingStartCap" Value="Round" />
+        <Setter Property="TrackRingEndCap" Value="Round" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:PercentageRing">
-                    <Viewbox Width="{TemplateBinding Width}"
-                             Height="{TemplateBinding Height}"
-                             Stretch="UniformToFill"
-                             UseLayoutRounding="True">
+                    <Grid Width="{TemplateBinding Width}"
+                          Height="{TemplateBinding Height}"
+                          Padding="{TemplateBinding Padding}"
+                          Background="Transparent"
+                          BorderBrush="Red"
+                          BorderThickness="1">
 
-                        <!--  Canvas used for the rings  -->
-                        <Canvas x:Name="PART_RingCanvas"
-                                Width="160"
-                                Height="160"
-                                Background="Transparent">
-                            <Canvas.Resources>
-                                <Storyboard x:Name="UpdateValueAnimation" />
-                            </Canvas.Resources>
+                        <Canvas x:Name="PART_Container"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Background="{TemplateBinding Background}">
 
-                            <!--  Path used for the Main ring  -->
-                            <Path x:Name="PART_MainPath"
-                                  Stroke="{ThemeResource AccentFillColorDefaultBrush}"
-                                  StrokeEndLineCap="Round"
+                            <Path x:Name="PART_Track"
+                                  Canvas.Left="0"
+                                  Canvas.Top="0"
+                                  Stroke="{TemplateBinding TrackRingBrush}"
+                                  StrokeEndLineCap="{TemplateBinding TrackRingEndCap}"
                                   StrokeLineJoin="Round"
-                                  StrokeStartLineCap="Round">
-                                <Path.Data>
-                                    <PathGeometry x:Name="MainPathGeometry">
-                                        <PathFigure x:Name="MainPathFigure" />
-                                    </PathGeometry>
-                                </Path.Data>
-                            </Path>
+                                  StrokeStartLineCap="{TemplateBinding TrackRingStartCap}" />
 
-                            <!--  Path used for the Track ring  -->
-                            <Path x:Name="PART_TrackPath"
-                                  Stroke="{ThemeResource ControlStrongStrokeColorDefault}"
-                                  StrokeEndLineCap="Round"
+                            <Path x:Name="PART_Main"
+                                  Canvas.Left="0"
+                                  Canvas.Top="0"
+                                  Stroke="{TemplateBinding MainRingBrush}"
+                                  StrokeEndLineCap="{TemplateBinding MainRingEndCap}"
                                   StrokeLineJoin="Round"
-                                  StrokeStartLineCap="Round">
-                                <Path.Data>
-                                    <PathGeometry x:Name="TrackPathGeometry">
-                                        <PathFigure x:Name="TrackPathFigure" />
-                                    </PathGeometry>
-                                </Path.Data>
-                            </Path>
-
-
+                                  StrokeStartLineCap="{TemplateBinding MainRingStartCap}" />
 
                         </Canvas>
-                    </Viewbox>
+
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

@@ -4,7 +4,6 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="ms-appx:///PercentageRing/PercentageRing.xaml" />
-        <ResourceDictionary Source="ms-appx:///PercentageRingTwo/PercentageRingTwo.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
 

@@ -14,7 +14,6 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="PercentageBar\PercentageBar.xaml" />
-    <None Remove="PercentageRingTwo\PercentageRingTwo.xaml" />
     <None Remove="PercentageRing\PercentageRing.xaml" />
   </ItemGroup>
 

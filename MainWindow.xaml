@@ -20,41 +20,38 @@
                     HorizontalAlignment="Center"
                     Orientation="Horizontal"
                     Spacing="32">
-            <local:PercentageRingTwo Width="240"
-                                     Height="{x:Bind HeightTest.Value, Mode=OneWay}"
-                                     MainRingThickness="{x:Bind MainThickness.Value, Mode=TwoWay}"
-                                     TrackRingThickness="{x:Bind TrackThickness.Value, Mode=TwoWay}"
-                                     Maximum="90"
-                                     Minimum="10"
+            <local:PercentageRing Width="80"
+                                     Height="80"
+                                     Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
+            
+            <local:PercentageRing Width="32"
+                                     Height="128"
                                      Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
 
-            <local:PercentageRing x:Name="percentRingTest1"
-                                  Width="16"
-                                  Height="16"
-                                  MainRingPadding="{x:Bind MainPadding.Value, Mode=TwoWay}"
-                                  MainRingThickness="{x:Bind MainThickness.Value, Mode=TwoWay}"
-                                  TrackRingPadding="{x:Bind TrackPadding.Value, Mode=TwoWay}"
-                                  TrackRingThickness="{x:Bind TrackThickness.Value}"
-                                  Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
-            <local:PercentageRing x:Name="percentRingTest2"
-                                  Width="160"
-                                  Height="160"
-                                  MainRingPadding="{x:Bind MainPadding.Value, Mode=TwoWay}"
-                                  MainRingThickness="{x:Bind MainThickness.Value, Mode=TwoWay}"
-                                  TrackRingPadding="{x:Bind TrackPadding.Value, Mode=TwoWay}"
-                                  TrackRingThickness="{x:Bind TrackThickness.Value}"
-                                  Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
+            <local:PercentageRing Width="240"
+                                     Height="{x:Bind HeightTest.Value, Mode=OneWay}"
+                                     MainRingThickness="{x:Bind MainThickness.Value, Mode=TwoWay}"
+                                     Maximum="90"
+                                     Minimum="10"
+                                     TrackRingThickness="{x:Bind TrackThickness.Value, Mode=TwoWay}"
+                                     Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
+
+            <local:PercentageRing Width="64"
+                                     Height="48"
+                                     MainRingThickness="{x:Bind MainThickness.Value, Mode=TwoWay}"
+                                     TrackRingThickness="{x:Bind TrackThickness.Value, Mode=TwoWay}"
+                                     Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
+
+            <local:PercentageRing Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
         </StackPanel>
 
         <Slider x:Name="testSlider"
                 Grid.Row="0"
                 Width="480"
-                LargeChange="{x:Bind percentRingTest1.LargeChange}"
-                Maximum="{x:Bind percentRingTest1.Maximum}"
-                Minimum="{x:Bind percentRingTest1.Minimum}"
-                SmallChange="{x:Bind percentRingTest1.SmallChange}"
-                StepFrequency="{x:Bind percentRingTest1.SmallChange}"
-                Value="25" />
+                Value="25.00"
+                SmallChange="0.1"
+                TickFrequency="0.1"
+                LargeChange="10"/>
 
         <Grid Grid.Row="2"
               Padding="32,0,32,64"
@@ -62,23 +59,21 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
             <StackPanel Orientation="Vertical" Spacing="24">
                 <NumberBox x:Name="HeightTest"
+                           Width="320"
                            Grid.Column="0"
                            Margin="16,0"
                            Header="Height"
                            Maximum="320"
-                           Minimum="16"
+                           Minimum="4"
                            SpinButtonPlacementMode="Inline"
                            Value="128" />
 
                 <NumberBox x:Name="TrackThickness"
+                           Width="320"
                            Grid.Column="0"
                            Margin="16,0"
                            Header="Track Thickness"
@@ -89,6 +84,7 @@
             </StackPanel>
 
             <NumberBox x:Name="MainThickness"
+                       Width="320"
                        Grid.Column="1"
                        Margin="16,0"
                        VerticalAlignment="Bottom"
@@ -97,26 +93,6 @@
                        Minimum="1"
                        SpinButtonPlacementMode="Inline"
                        Value="30" />
-
-            <NumberBox x:Name="TrackPadding"
-                       Grid.Column="3"
-                       Margin="16,0"
-                       VerticalAlignment="Bottom"
-                       Header="Track Padding"
-                       Maximum="40"
-                       Minimum="0"
-                       SpinButtonPlacementMode="Inline"
-                       Value="10" />
-
-            <NumberBox x:Name="MainPadding"
-                       Grid.Column="4"
-                       Margin="16,0"
-                       VerticalAlignment="Bottom"
-                       Header="Main Padding"
-                       Maximum="40"
-                       Minimum="0"
-                       SpinButtonPlacementMode="Inline"
-                       Value="0" />
         </Grid>
     </Grid>
 </Window>
