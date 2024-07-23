@@ -1,10 +1,13 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Shapes;
 using System;
 using System.Net;
 using System.Security.Cryptography;
+using System.Threading;
+using System.Timers;
 using Windows.Foundation;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -22,6 +25,7 @@ namespace StorageControls
         double              _sharedRadius;          // Radius to be shared by both rings
 
         double              _oldValue;              // Stores the previous value
+        double              _oldValueAngle;         // Stored the old ValueAngle
 
         bool                _mainIsThickest;        // True when Main Ring is Thickest of the two
         double              _largerThickness;       // The larger of the two ring thicknesses
@@ -90,11 +94,19 @@ namespace StorageControls
         }
 
         /// <summary>
-        /// Sets the private Old value
+        /// Sets the private old Value
         /// </summary>
         void SetOldValue(double value)
         {
             _oldValue = value;
+        }
+
+        /// <summary>
+        /// Sets the private old ValueAngle
+        /// </summary>
+        void SetOldValueAngle(double value)
+        {
+            _oldValueAngle = value;
         }
 
         /// <summary>
@@ -215,11 +227,19 @@ namespace StorageControls
         }
 
         /// <summary>
-        /// Gets the Old value
+        /// Gets the old Value
         /// </summary>
         double GetOldValue()
         {
             return _oldValue;
+        }
+
+        /// <summary>
+        /// Gets the old ValueAngle
+        /// </summary>
+        double GetOldValueAngle()
+        {
+            return _oldValueAngle;
         }
 
         /// <summary>
@@ -385,7 +405,7 @@ namespace StorageControls
         /// Ensures <strong>_normalizedMinAngle</strong> is in the range [-180, 180)
         /// and <strong>_normalizedMaxAngle</strong> is in the range [0, 360).
         /// </summary>
-        void UpdateNormalizedAngles()
+        private void UpdateNormalizedAngles()
         {
             // Calculate the modulus of MinAngle to ensure it's within [0, 360)
             var result = Modulus(MinAngle, 360);
@@ -420,7 +440,7 @@ namespace StorageControls
         /// </summary>
         /// <param name="d">The DependencyObject representing the control.</param>
         /// <param name="useTransition">Indicates whether to use a transition effect.</param>
-        void UpdateLayout(DependencyObject d, bool useTransition)
+        private void UpdateLayout(DependencyObject d, bool useTransition)
         {
             var pRing = (PercentageRing)d;
 
@@ -487,7 +507,6 @@ namespace StorageControls
                     container.Clip = GetClippingRectGeo();
                 }
 
-
                 UpdateLayout(pRing, false);
             };
         }
@@ -509,6 +528,8 @@ namespace StorageControls
                 if (!double.IsNaN(pRing.Value))
                 {
                     pRing.SetOldValue(oldValue);
+
+                    pRing.SetOldValueAngle(pRing.DoubleToAngle(oldValue, Minimum, Maximum, MinAngle, MaxAngle));
 
                     // Updates the ValueAngle property
                     pRing.ValueAngle = pRing.DoubleToAngle(newValue, Minimum, Maximum, MinAngle, MaxAngle);
@@ -544,6 +565,7 @@ namespace StorageControls
                 pRing.SetLargerThickness(pRing.MainRingThickness);
                 pRing.SetSmallerThickness(pRing.TrackRingThickness);
             }
+
             pRing.UpdateLayout(d, false);
         }
 
@@ -591,9 +613,8 @@ namespace StorageControls
             {
                 var pRing = (PercentageRing)d;
 
-                DrawMainRing(d, useTransition);
-
-                DrawTrackRing(d, useTransition);
+                DrawMainRing(d, pRing.Value, pRing.GetOldValue(), pRing.ValueAngle, useTransition);
+                DrawTrackRing(d, pRing.Value, pRing.GetOldValue(), pRing.ValueAngle);
             }
         }
 
@@ -604,11 +625,31 @@ namespace StorageControls
         /// </summary>
         /// <param name="d">The DependencyObject representing the control.</param>
         /// <param name="useTransition">Indicates whether to use a transition effect.</param>
-        private static void DrawMainRing(DependencyObject d, bool useTransition)
+        private static void DrawMainRing(DependencyObject d, double value, double oldValue, double angle, bool useTransition)
         {
             var pRing = (PercentageRing)d;
-
             var path = pRing.GetMainRingPath();
+
+            Storyboard storyboard = null;
+            DoubleAnimation animX = null;
+            DoubleAnimation animY = null;
+
+            if (useTransition)
+            {
+                // Find the storyboard
+                storyboard = pRing.GetTemplateChild(MainStoryboardPartName) as Storyboard;
+                animX = pRing.GetTemplateChild(MainAnimationXPartName) as DoubleAnimation;
+                animY = pRing.GetTemplateChild(MainAnimationYPartName) as DoubleAnimation;
+
+                if (storyboard != null)
+                {
+                    animX.Duration = TimeSpan.FromSeconds(2.0);
+                    animX.EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut };
+
+                    animY.Duration = TimeSpan.FromSeconds(2.0);
+                    animY.EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut };
+                }
+            };
 
             if (path != null)
             {
@@ -636,16 +677,21 @@ namespace StorageControls
                 else if (pRing.Value > (pRing.Minimum) && pRing.Value < pRing.Minimum + 1)
                 {
                     var startPoint = pRing.GetPointAroundRadius(MinAngle, radius, containerCentre);
+                    var oldEndPoint = pRing.GetPointAroundRadius(MinAngle + 0.1, radius, containerCentre);
                     var endPoint = pRing.GetPointAroundRadius(MinAngle + 0.1, radius, containerCentre);
 
                     pRing.DrawArc(
                         d,
                         path,
                         startPoint,
+                        oldEndPoint,
                         endPoint,
                         new Size(size, size),
                         pRing.CheckMainArcLargeAngle(pRing.ValueAngle, 0),
-                        SweepDirection.Clockwise);
+                        SweepDirection.Clockwise,
+                        storyboard,
+                        animX,
+                        animY);
 
                     path.StrokeThickness = pRing.DrawThicknessTransition(d, pRing.Minimum + 0.01, pRing.Value, pRing.Minimum + 1.01, 0.0, ringThickness, true);
                 }
@@ -662,16 +708,21 @@ namespace StorageControls
                 else
                 {
                     var startPoint = pRing.GetPointAroundRadius(MinAngle, radius, containerCentre);
+                    var oldEndPoint = pRing.GetPointAroundRadius(pRing.GetOldValueAngle() - 0.1, radius, containerCentre);
                     var endPoint = pRing.GetPointAroundRadius(pRing.ValueAngle - 0.1, radius, containerCentre);
 
                     pRing.DrawArc(
                         d,
                         path,
                         startPoint,
+                        oldEndPoint,
                         endPoint,
                         new Size(size, size),
                         pRing.CheckMainArcLargeAngle(pRing.ValueAngle, 0),
-                        SweepDirection.Clockwise);
+                        SweepDirection.Clockwise,
+                        storyboard,
+                        animX,
+                        animY);
 
                     path.StrokeThickness = ringThickness;
                 }
@@ -685,11 +736,15 @@ namespace StorageControls
         /// </summary>
         /// <param name="d">The DependencyObject representing the control.</param>
         /// <param name="useTransition">Indicates whether to use a transition effect.</param>
-        private static void DrawTrackRing(DependencyObject d, bool useTransition)
+        private static void DrawTrackRing(DependencyObject d, double value, double oldValue, double angle)
         {
             var pRing = (PercentageRing)d;
 
             var path = pRing.GetTrackRingPath();
+
+            Storyboard storyboard = null;
+            DoubleAnimation animX = null;
+            DoubleAnimation animY = null;
 
             if (path != null)
             {
@@ -723,20 +778,26 @@ namespace StorageControls
                         var endStartAngle = MinAngle;                       // Initial start angle
                         var endEndAngle = MinAngle + gapAngle;              // Angle when value = 1
 
-                        double adjustedStartAngle = pRing.DrawAdjustedAngle(pRing, pRing.Minimum, pRing.Value, pRing.Minimum + 1, beginStartAngle, beginEndAngle, pRing.ValueAngle, true);
+                        var adjustedStartAngle = pRing.DrawAdjustedAngle(pRing, pRing.Minimum, pRing.Value, pRing.Minimum + 1, beginStartAngle, beginEndAngle, pRing.ValueAngle, true);
                         var adjustedEndAngle = pRing.DrawAdjustedAngle(pRing, pRing.Minimum, pRing.Value, pRing.Minimum + 1, endStartAngle, endEndAngle, pRing.ValueAngle, true);
+                        var adjustedOldEndAngle = pRing.DrawAdjustedAngle(pRing, pRing.Minimum, pRing.GetOldValue(), pRing.Minimum + 1, endStartAngle, endEndAngle, pRing.GetOldValueAngle(), true);
 
                         var startPoint = pRing.GetPointAroundRadius(adjustedStartAngle, radius, containerCentre);
+                        var oldEndPoint = pRing.GetPointAroundRadius(adjustedEndAngle, radius, containerCentre);
                         var endPoint = pRing.GetPointAroundRadius(adjustedEndAngle, radius, containerCentre);
 
                         pRing.DrawArc(
                             d,
                             path,
                             startPoint,
+                            oldEndPoint,
                             endPoint,
                             new Size(size, size),
                             pRing.CheckTrackArcLargeAngle(pRing.ValueAngle, gapAngle),
-                            SweepDirection.Counterclockwise);
+                            SweepDirection.Counterclockwise,
+                            storyboard,
+                            animX,
+                            animY);
 
                         path.StrokeThickness = ringThickness;
                     }
@@ -754,6 +815,7 @@ namespace StorageControls
                 else
                 {
                     var startPoint = pRing.GetPointAroundRadius(MinAngle - gapAngle, radius, containerCentre);
+                    var oldEndPoint = pRing.GetPointAroundRadius(pRing.GetOldValueAngle() - gapAngle, radius, containerCentre);
                     var endPoint = pRing.GetPointAroundRadius(pRing.ValueAngle + gapAngle, radius, containerCentre);
 
                     //
@@ -766,10 +828,14 @@ namespace StorageControls
                             d,
                             path,
                             startPoint,
+                            oldEndPoint,
                             endPoint2,
                             new Size(size, size),
                             pRing.CheckTrackArcLargeAngle(pRing.ValueAngle, gapAngle),
-                            SweepDirection.Counterclockwise);
+                            SweepDirection.Counterclockwise,
+                            storyboard,
+                            animX,
+                            animY);
 
                         path.StrokeThickness = pRing.DrawThicknessTransition(d, (MaxAngle - (gapAngle * 2)), pRing.ValueAngle, (MaxAngle - gapAngle), ringThickness, 0.0, true);
                     }
@@ -779,10 +845,14 @@ namespace StorageControls
                             d,
                             path,
                             startPoint,
+                            oldEndPoint,
                             endPoint,
                             new Size(size, size),
                             pRing.CheckTrackArcLargeAngle(pRing.ValueAngle, gapAngle),
-                            SweepDirection.Counterclockwise);
+                            SweepDirection.Counterclockwise,
+                            storyboard,
+                            animX,
+                            animY);
 
                         path.StrokeThickness = ringThickness;
 
@@ -804,30 +874,18 @@ namespace StorageControls
         /// <param name="size">The size of the arc (width and height).</param>
         /// <param name="largeArc">Indicates whether the arc should be a large arc.</param>
         /// <param name="sweepDirection">The direction in which the arc sweeps.</param>
-        private void DrawArc(DependencyObject d, Path ringPath, Point startPoint, Point endPoint, Size size, bool largeArc, SweepDirection sweepDirection)
+        private void DrawArc(DependencyObject d, Path ringPath, Point startPoint, Point oldEndPoint, Point endPoint, Size size, bool largeArc, SweepDirection sweepDirection, Storyboard storyboard, DoubleAnimation animX, DoubleAnimation animY)
         {
             if (ringPath != null)
             {
                 var pRing = (PercentageRing)d;
 
                 var pg = new PathGeometry();
-
                 var pf = new PathFigure
                 {
                     IsClosed = false,
                     IsFilled = false,
                 };
-
-                // Checks to ensure size is not negative or zero
-                Size sizeChecked;
-                if (size.Height <= 0 || size.Width <= 0)
-                {
-                    sizeChecked = new Size(10, 10);
-                }
-                else
-                {
-                    sizeChecked = size;
-                }                
 
                 // Sets the start point to the top and center of the canvas
                 pf.StartPoint = startPoint;
@@ -836,7 +894,7 @@ namespace StorageControls
                 {
                     SweepDirection = sweepDirection,
                     IsLargeArc = largeArc,
-                    Size = sizeChecked,
+                    Size = size,
                     // Sets the end point to an angle, calculated from the value, to a position around the radius of the ring
                     Point = endPoint,
                 };
@@ -845,6 +903,14 @@ namespace StorageControls
                 pg.Figures.Add(pf);
 
                 ringPath.Data = pg;
+
+                if (storyboard != null)
+                {
+                    storyboard.Children.Add(animX);
+                    storyboard.Children.Add(animY);
+
+                    animX.SetValue(Storyboard.TargetPropertyProperty, ringPath);
+                }
             };
         }
 
@@ -953,17 +1019,6 @@ namespace StorageControls
             }
 
             return interpolatedAngle;
-        }
-
-
-
-        /// <summary>
-        /// Example quadratic ease-in-out function
-        /// </summary>
-        private double EasingInOutFunction(double t)
-        {
-            // Quadratic ease-in-out
-            return t < 0.5 ? 2 * t * t : 1 - Math.Pow(-2 * t + 2, 2) / 2;
         }
 
         #endregion
@@ -1151,6 +1206,26 @@ namespace StorageControls
         {
             // Linear interpolation formula (lerp): GetInterpolatedAngle = (startAngle + valueAngle) * (endAngle - startAngle)
             return (startAngle + valueAngle) * (endAngle - startAngle);
+        }
+
+
+
+        /// <summary>
+        /// Example quadratic ease-in-out function
+        /// </summary>
+        private double EasingInOutFunction(double t)
+        {
+            return t < 0.5 ? 2 * t * t : 1 - Math.Pow(-2 * t + 2, 2) / 2;
+        }
+
+
+
+        /// <summary>
+        /// Example ease-out cubic function
+        /// </summary>
+        static double EaseOutCubic(double t)
+        {
+            return 1.0 - Math.Pow(1.0 - t, 3.0);
         }
 
         #endregion

@@ -28,6 +28,18 @@
                           Height="{TemplateBinding Height}"
                           Padding="{TemplateBinding Padding}"
                           BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid.Resources>
+                            <Storyboard x:Key="PART_MainStoryboard">
+                                <DoubleAnimation x:Name="PART_MainAnimationX" />
+
+                                <DoubleAnimation x:Name="PART_MainAnimationY" />
+                            </Storyboard>
+                            <Storyboard x:Key="PART_TrackStoryboard">
+                                <DoubleAnimation x:Name="PART_TrackAnimationX" />
+
+                                <DoubleAnimation x:Name="PART_TrackAnimationY" />
+                            </Storyboard>
+                        </Grid.Resources>
 
                         <Canvas x:Name="PART_Container"
                                 HorizontalAlignment="Center"
