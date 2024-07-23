@@ -14,7 +14,6 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="PercentageBar\PercentageBar.xaml" />
-    <None Remove="PercentageRing\PercentageRing.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,17 +41,7 @@
     <ProjectCapability Include="Msix" />
   </ItemGroup>
   <ItemGroup>
-    <Page Update="PercentageRing2\PercentageRing2.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
     <Page Update="PercentageBar\PercentageBar.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="PercentageRing\PercentageRing.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

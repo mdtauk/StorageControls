@@ -14,6 +14,7 @@
         <Setter Property="MainRingBrush" Value="{ThemeResource AccentFillColorDefaultBrush}" />
         <Setter Property="TrackRingBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}" />
         <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
         <Setter Property="MainRingThickness" Value="3" />
         <Setter Property="TrackRingThickness" Value="1" />
         <Setter Property="MainRingStartCap" Value="Round" />
@@ -26,9 +27,7 @@
                     <Grid Width="{TemplateBinding Width}"
                           Height="{TemplateBinding Height}"
                           Padding="{TemplateBinding Padding}"
-                          Background="Transparent"
-                          BorderBrush="Red"
-                          BorderThickness="1">
+                          BorderThickness="{TemplateBinding BorderThickness}">
 
                         <Canvas x:Name="PART_Container"
                                 HorizontalAlignment="Center"
