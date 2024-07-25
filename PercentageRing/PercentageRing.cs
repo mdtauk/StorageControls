@@ -1,44 +1,47 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Shapes;
 using System;
-using System.Net;
-using System.Security.Cryptography;
-using System.Threading;
-using System.Timers;
 using Windows.Foundation;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace StorageControls
 {
     /// <summary>
     /// A control which takes a value and converts to a percentage displayed on a circular ring
     /// </summary>
-    public partial class PercentageRing : Control
+    public partial class PercentageRing : RangeBase
     {
         #region 1. Private variables
 
-        double              _containerSize;         // Size of the inner container after padding
-        double              _containerCenter;       // Center X and Y value of the inner container
-        double              _sharedRadius;          // Radius to be shared by both rings
+        double              _containerSize;                 // Size of the inner container after padding
+        double              _containerCenter;               // Center X and Y value of the inner container
+        double              _sharedRadius;                  // Radius to be shared by both rings
 
-        double              _oldValue;              // Stores the previous value
-        double              _oldValueAngle;         // Stored the old ValueAngle
+        double              _oldValue;                      // Stores the previous value
+        double              _oldValueAngle;                 // Stored the old ValueAngle
 
-        bool                _mainIsThickest;        // True when Main Ring is Thickest of the two
-        double              _largerThickness;       // The larger of the two ring thicknesses
-        double              _smallerThickness;      // The smaller of the two ring thicknesses
+        bool                _mainIsThickest;                // True when Main Ring is Thickest of the two
+        double              _largerThickness;               // The larger of the two ring thicknesses
+        double              _smallerThickness;              // The smaller of the two ring thicknesses
 
-        Canvas              _containerCanvas;       // Reference to the container Canvas
-        Path                _mainPath;              // Reference to the Main ring's ArcSegment path
-        Path                _trackPath;             // Reference to the Track ring's ArcSegment path
-        RectangleGeometry   _clipRect;              // Clipping RectangleGeometry for the canvas
+        Grid                _containerGrid;                 // Reference to the container Grid
+        RingControl         _mainRingControl;               // Reference to the Main RingControl
+        RingControl         _trackRingControl;              // Reference to the Track RingControl
 
-        double              _normalizedMinAngle;    // Stores the normalised Minimum Angle
-        double              _normalizedMaxAngle;    // Stores the normalise Maximum Angle
-        double              _gapAngle;              // Stores the angle to be used to separate Main and Track rings
+        Storyboard          _storyboard;                    // Stores a reference to the control Storyboard
+        DoubleAnimation     _mainStartDoubleAnimation;      // Stores a reference to the Main StartAngle Ring Animation
+        DoubleAnimation     _mainEndDoubleAnimation;        // Stores a reference to the Main Ring EndAngle Animation
+        DoubleAnimation     _trackStartDoubleAnimation;     // Stores a reference to the Track StartAngle Ring Animation
+        DoubleAnimation     _trackEndDoubleAnimation;       // Stores a reference to the Track EndAngle Ring Animation
+
+        RectangleGeometry   _clipRect;                      // Clipping RectangleGeometry for the canvas
+
+        double              _normalizedMinAngle;            // Stores the normalised Minimum Angle
+        double              _normalizedMaxAngle;            // Stores the normalise Maximum Angle
+        double              _gapAngle;                      // Stores the angle to be used to separate Main and Track rings
 
         #endregion
 
@@ -53,7 +56,7 @@ namespace StorageControls
         {
             double correctedWidth = controlWidth - (padding.Left + padding.Right);
             double correctedHeight = controlHeight - (padding.Top + padding.Bottom);
-            
+
             double check = Math.Min(correctedWidth, correctedHeight);
             double minSize = 8;
 
@@ -143,32 +146,72 @@ namespace StorageControls
         /// <summary>
         /// Sets the private Canvas reference
         /// </summary>
-        void SetContainerCanvas(Canvas canvas)
+        void SetContainerGrid(Grid grid)
         {
-            _containerCanvas = canvas;
+            _containerGrid = grid;
         }
 
         /// <summary>
-        /// Sets the private Main ring's Path reference
+        /// Sets the private Main RingControl reference
         /// </summary>
-        void SetMainRingPath(Path path)
+        void SetMainRingControl(RingControl ringControl)
         {
-            _mainPath = path;
+            _mainRingControl = ringControl;
         }
 
         /// <summary>
-        /// Sets the private Track ring's Path reference
+        /// Sets the private Track RingControl reference
         /// </summary>
-        void SetTrackRingPath(Path path)
+        void SetTrackRingControl(RingControl ringControl)
         {
-            _trackPath = path;
+            _trackRingControl = ringControl;
+        }
+
+        /// <summary>
+        /// Sets the private Storyboard reference
+        /// </summary>
+        void SetStoryboard(Storyboard storyboard)
+        {
+            _storyboard = storyboard;
+        }
+
+        /// <summary>
+        /// Sets the private Main StartPoint DoubleAnimation reference
+        /// </summary>
+        void SetMainStartDoubleAnimation(DoubleAnimation doubleAnimation)
+        {
+            _mainStartDoubleAnimation = doubleAnimation;
+        }
+
+        /// <summary>
+        /// Sets the private Main EndPoint DoubleAnimation reference
+        /// </summary>
+        void SetMainEndDoubleAnimation(DoubleAnimation doubleAnimation)
+        {
+            _mainEndDoubleAnimation = doubleAnimation;
+        }
+
+        /// <summary>
+        /// Sets the private Track StartPoint DoubleAnimation reference
+        /// </summary>
+        void SetTrackStartDoubleAnimation(DoubleAnimation doubleAnimation)
+        {
+            _trackStartDoubleAnimation = doubleAnimation;
+        }
+
+        /// <summary>
+        /// Sets the private Track EndPoint DoubleAnimation reference
+        /// </summary>
+        void SetTrackEndDoubleAnimation(DoubleAnimation doubleAnimation)
+        {
+            _trackEndDoubleAnimation = doubleAnimation;
         }
 
         /// <summary>
         /// Sets the clipping RectangleGeometry for the Canvas
         /// </summary>
         void SetClippingRectGeo(RectangleGeometry clipRectGeo)
-        { 
+        {
             _clipRect = clipRectGeo;
         }
 
@@ -267,27 +310,67 @@ namespace StorageControls
         }
 
         /// <summary>
-        /// Gets the Container Canvas reference
+        /// Gets the Container Grid reference
         /// </summary>
-        Canvas GetContainerCanvas()
+        Grid GetContainerGrid()
         {
-            return _containerCanvas;
+            return _containerGrid;
         }
 
         /// <summary>
-        /// Gets the Main Ring Path reference
+        /// Gets the Main RingControl reference
         /// </summary>
-        Path GetMainRingPath()
+        RingControl GetMainRingControl()
         {
-            return _mainPath;
+            return _mainRingControl;
         }
 
         /// <summary>
-        /// Gets the Track Ring Path reference
+        /// Gets the Track RingControl reference
         /// </summary>
-        Path GetTrackRingPath()
+        RingControl GetTrackRingControl()
         {
-            return _trackPath;
+            return _trackRingControl;
+        }
+
+        /// <summary>
+        /// Gets the Storyboard reference
+        /// </summary>
+        Storyboard GetStoryboard()
+        {
+            return _storyboard;
+        }
+
+        /// <summary>
+        /// Gets the Main StartAngle DoubleAnimation reference
+        /// </summary>
+        DoubleAnimation GetMainStartDoubleAnimation()
+        {
+            return _mainStartDoubleAnimation;
+        }
+
+        /// <summary>
+        /// Gets the Main EndAngle DoubleAnimation reference
+        /// </summary>
+        DoubleAnimation GetMainEndDoubleAnimation()
+        {
+            return _mainEndDoubleAnimation;
+        }
+
+        /// <summary>
+        /// Gets the Track StartAngle DoubleAnimation reference
+        /// </summary>
+        DoubleAnimation GetTrackStartDoubleAnimation()
+        {
+            return _trackStartDoubleAnimation;
+        }
+
+        /// <summary>
+        /// Gets the Track EndAngle DoubleAnimation reference
+        /// </summary>
+        DoubleAnimation GetTrackEndDoubleAnimation()
+        {
+            return _trackEndDoubleAnimation;
         }
 
         /// <summary>
@@ -359,9 +442,19 @@ namespace StorageControls
         private void InitializeValues()
         {
             // Retrieve references to visual elements
-            SetContainerCanvas(GetTemplateChild(ContainerPartName) as Canvas);
-            SetMainRingPath(GetTemplateChild(MainPartName) as Path);
-            SetTrackRingPath(GetTemplateChild(TrackPartName) as Path);
+            SetContainerGrid(GetTemplateChild(ContainerPartName) as Grid);
+
+            SetMainRingControl(GetTemplateChild(MainRingControlPartName) as RingControl);
+            SetTrackRingControl(GetTemplateChild(TrackRingControlPartName) as RingControl);
+
+            if (GetContainerGrid() != null)
+            {
+                SetStoryboard(GetTemplateChild(StoryboardPartName) as Storyboard);
+                SetMainStartDoubleAnimation(GetTemplateChild(MainStartAnimationPartName) as DoubleAnimation);
+                SetMainEndDoubleAnimation(GetTemplateChild(MainEndAnimationPartName) as DoubleAnimation);
+                SetTrackStartDoubleAnimation(GetTemplateChild(TrackStartAnimationPartName) as DoubleAnimation);
+                SetTrackEndDoubleAnimation(GetTemplateChild(TrackEndAnimationPartName) as DoubleAnimation);
+            }
 
             // Set container size and center
             SetContainerSize(Width, Height, Padding);
@@ -462,11 +555,11 @@ namespace StorageControls
             SetSharedRadius(GetContainerSize(), GetLargerThickness());
 
             // Calculate the gap angle
-            double angle = GapThicknessToAngle(GetSharedRadius(), GetLargerThickness() / 1.5);
+            double angle = pRing.GapThicknessToAngle(GetSharedRadius(), GetLargerThickness() / 1.5);
             SetGapAngle(angle);
 
             // Draw all rings with the specified transition
-            DrawAllRings(pRing, useTransition, pRing.GetMainRingPath());
+            DrawAllRings(pRing, useTransition);
         }
 
         #endregion
@@ -497,9 +590,9 @@ namespace StorageControls
                 SetClippingRectGeo(rectGeo);
 
                 // Check if the Container is not null.
-                if (GetContainerCanvas() != null)
+                if (GetContainerGrid() != null)
                 {
-                    var container = GetContainerCanvas();
+                    var container = GetContainerGrid();
 
                     // Set the _container width and height to the adjusted size (_adjSize).
                     container.Width = GetContainerSize();
@@ -508,7 +601,7 @@ namespace StorageControls
                 }
 
                 UpdateLayout(pRing, false);
-            };
+            }
         }
 
 
@@ -519,27 +612,35 @@ namespace StorageControls
         /// <param name="d">The DependencyObject representing the control.</param>
         /// <param name="newValue">The new value.</param>
         /// <param name="oldValue">The old value.</param>
-        private void ValueChanged(DependencyObject d, double newValue, double oldValue)
+        private void OnValueChanged(DependencyObject d)
         {
-            if (newValue != oldValue)
-            {
-                var pRing = (PercentageRing)d;
+            var pRing = (PercentageRing)d;
 
-                if (!double.IsNaN(pRing.Value))
-                {
-                    pRing.SetOldValue(oldValue);
+            // Updates the ValueAngle property
+            pRing.ValueAngle = pRing.DoubleToAngle(pRing.Value, pRing.Minimum, pRing.Maximum, MinAngle, MaxAngle);
 
-                    pRing.SetOldValueAngle(pRing.DoubleToAngle(oldValue, Minimum, Maximum, MinAngle, MaxAngle));
+            // Updates the Percent value as a formatted string
+            pRing.Percent = pRing.GetPercentageString(pRing.Value, pRing.Minimum, pRing.Maximum);
 
-                    // Updates the ValueAngle property
-                    pRing.ValueAngle = pRing.DoubleToAngle(newValue, Minimum, Maximum, MinAngle, MaxAngle);
+            pRing.UpdateLayout(d, true);
+        }
 
-                    // Updates the Percent value as a formatted string
-                    pRing.Percent = pRing.GetPercentageString(newValue, pRing.Minimum, pRing.Maximum);
 
-                    UpdateLayout(d, true);
-                }
-            };
+
+        /// <inheritdoc/>
+        protected override void OnMinimumChanged(double oldMinimum, double newMinimum)
+        {
+            base.OnMinimumChanged(oldMinimum, newMinimum);
+            UpdateLayout(this, false);
+        }
+
+
+
+        /// <inheritdoc/>
+        protected override void OnMaximumChanged(double oldMaximum, double newMaximum)
+        {
+            base.OnMaximumChanged(oldMaximum, newMaximum);
+            UpdateLayout(this, false);
         }
 
 
@@ -607,14 +708,151 @@ namespace StorageControls
         /// </summary>
         /// <param name="d">The DependencyObject representing the control.</param>
         /// <param name="useTransition">Indicates whether to use a transition effect.</param>
-        private static void DrawAllRings(DependencyObject d, bool useTransition, Path path)
+        private static void DrawAllRings(DependencyObject d, bool useTransition)
         {
-            if (path != null)
-            {
-                var pRing = (PercentageRing)d;
+            var pRing = (PercentageRing)d;
 
-                DrawMainRing(d, pRing.Value, pRing.GetOldValue(), pRing.ValueAngle, useTransition);
-                DrawTrackRing(d, pRing.Value, pRing.GetOldValue(), pRing.ValueAngle);
+            RingControl mainRing = pRing.GetMainRingControl();
+            RingControl trackRing = pRing.GetTrackRingControl();            
+
+            if (mainRing != null && trackRing != null)
+            {
+                // Grab the elements we need
+                Storyboard storyboard = pRing.GetStoryboard();
+                DoubleAnimation mainStartAnimation = pRing.GetMainStartDoubleAnimation();
+                DoubleAnimation mainEndAnimation = pRing.GetMainEndDoubleAnimation();
+                DoubleAnimation trackStartAnimation = pRing.GetTrackStartDoubleAnimation();
+                DoubleAnimation trackEndAnimation = pRing.GetTrackEndDoubleAnimation();
+
+                // Set sizes for the rings as needed
+                if (pRing.CheckMainIsThickest())
+                {
+                    mainRing.Width = pRing.GetContainerSize();
+                    mainRing.Height = pRing.GetContainerSize();
+
+                    trackRing.Width = pRing.GetContainerSize() - (pRing.GetLargerThickness() / 2);
+                    trackRing.Height = pRing.GetContainerSize() - (pRing.GetLargerThickness() / 2);
+                }
+                else
+                {
+                    mainRing.Width = pRing.GetContainerSize() - (pRing.GetLargerThickness() / 2);
+                    mainRing.Height = pRing.GetContainerSize() - (pRing.GetLargerThickness() / 2);
+
+                    trackRing.Width = pRing.GetContainerSize();
+                    trackRing.Height = pRing.GetContainerSize();
+                }
+
+                // We gather some variables we need for setting RingControl properties
+                double previousMainStartAngle = MinAngle;
+                double nextMainStartAngle;
+
+                double previousMainEndAngle;
+                double nextMainEndAngle;
+
+                double previousTrackStartAngle;
+                double nextTrackStartAngle;
+
+                double previousTrackEndAngle;
+                double nextTrackEndAngle;
+
+                // Here we set the Previous variables
+                if (pRing.GetOldValue() <= pRing.Minimum)
+                {
+                    previousMainEndAngle        = MinAngle;
+
+                    previousTrackStartAngle     = MinAngle;
+                    previousTrackEndAngle       = MaxAngle;
+                }
+                else if (pRing.GetOldValue() > pRing.Minimum && pRing.GetOldValue() < (pRing.Minimum + 1))
+                {
+                    previousMainEndAngle        = MinAngle;
+
+                    previousTrackStartAngle     = MinAngle;
+                    previousTrackEndAngle       = MaxAngle;
+                }
+                else if (pRing.GetOldValue() == pRing.Maximum)
+                {
+                    previousMainEndAngle        = MaxAngle;
+
+                    previousTrackStartAngle     = MinAngle;
+                    previousTrackEndAngle       = MaxAngle;
+                }
+                else
+                {
+                    previousMainEndAngle        = pRing.GetOldValue();
+
+                    previousTrackStartAngle     = MinAngle + pRing.GetGapAngle();
+                    previousTrackEndAngle       = MaxAngle - pRing.GetGapAngle();
+                }
+                
+
+                // Here we set the Next variables
+                if (pRing.Value <= pRing.Minimum)
+                {
+                    nextMainStartAngle          = MinAngle;
+                    nextMainEndAngle            = MinAngle+1;
+
+                    nextTrackStartAngle         = MinAngle;
+                    nextTrackEndAngle           = MaxAngle;
+                }
+                //
+                // Else if the value is between the minimum (with an offset) and the minimum + 1
+                else if (pRing.Value > (pRing.Minimum) && pRing.Value < pRing.Minimum + 1)
+                {
+                    nextMainStartAngle          = MinAngle;
+                    nextMainEndAngle            = pRing.ValueAngle;
+
+                    nextTrackStartAngle         = MinAngle + pRing.GetGapAngle();
+                    nextTrackEndAngle           = pRing.ValueAngle - pRing.GetGapAngle();
+                }
+                //
+                // Else if the value is greater than or equal to the Maximum
+                else if (pRing.Value >= pRing.Maximum)
+                {
+                    nextMainStartAngle          = MinAngle;
+                    nextMainEndAngle            = pRing.ValueAngle;
+
+                    nextTrackStartAngle         = MinAngle - pRing.GetGapAngle();
+                    nextTrackEndAngle           = pRing.ValueAngle ;
+                }
+                //
+                // For any value between Minimum and Maximum
+                else
+                {
+                    nextMainStartAngle          = MinAngle;
+                    nextMainEndAngle            = pRing.ValueAngle;
+
+                    nextTrackStartAngle         = MinAngle - pRing.GetGapAngle();
+                    nextTrackEndAngle           = pRing.ValueAngle ;
+                }
+
+                if (useTransition)
+                {
+                    if (storyboard != null)
+                    {
+                        mainStartAnimation.From     = previousMainStartAngle;
+                        mainStartAnimation.To       = nextMainStartAngle;
+
+                        mainEndAnimation.From       = previousMainEndAngle;
+                        mainEndAnimation.To         = nextMainEndAngle;
+
+                        trackStartAnimation.From    = previousTrackStartAngle;
+                        trackStartAnimation.To      = nextTrackStartAngle;
+
+                        trackEndAnimation.From      = previousTrackEndAngle;
+                        trackEndAnimation.To        = nextTrackEndAngle;
+
+                        storyboard.Begin();
+                    }
+                }
+                else
+                {
+                    mainRing.StartAngle     = nextMainStartAngle;
+                    mainRing.EndAngle       = nextMainEndAngle;
+
+                    trackRing.StartAngle    = nextTrackStartAngle;
+                    trackRing.EndAngle      = nextTrackEndAngle;
+                }
             }
         }
 
@@ -628,606 +866,468 @@ namespace StorageControls
         private static void DrawMainRing(DependencyObject d, double value, double oldValue, double angle, bool useTransition)
         {
             var pRing = (PercentageRing)d;
-            var path = pRing.GetMainRingPath();
 
-            Storyboard storyboard = null;
-            DoubleAnimation animX = null;
-            DoubleAnimation animY = null;
+            RingControl mainRing = pRing.GetMainRingControl();
 
-            if (useTransition)
+            if (mainRing != null)
             {
-                // Find the storyboard
-                storyboard = pRing.GetTemplateChild(MainStoryboardPartName) as Storyboard;
-                animX = pRing.GetTemplateChild(MainAnimationXPartName) as DoubleAnimation;
-                animY = pRing.GetTemplateChild(MainAnimationYPartName) as DoubleAnimation;
+                mainRing.Width = pRing.GetContainerSize();
+                mainRing.Height = pRing.GetContainerSize();
 
-                if (storyboard != null)
+                if (pRing.CheckMainIsThickest())
                 {
-                    animX.Duration = TimeSpan.FromSeconds(2.0);
-                    animX.EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut };
-
-                    animY.Duration = TimeSpan.FromSeconds(2.0);
-                    animY.EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut };
+                    mainRing.Width = pRing.GetContainerSize();
+                    mainRing.Height = pRing.GetContainerSize();
                 }
-            };
-
-            if (path != null)
-            {
-                var ringThickness = pRing.MainRingThickness;
-                var containerCentre = pRing.GetContainerCenter();
-
-                var radius = pRing.GetSharedRadius();
-                var gapAngle = pRing.GetGapAngle();
-                var centre = new Point(containerCentre, containerCentre);
-                var size = pRing.GetSharedRadius();
+                else
+                {
+                    mainRing.Width = pRing.GetContainerSize() - (pRing.GetLargerThickness() / 2);
+                    mainRing.Height = pRing.GetContainerSize() - (pRing.GetLargerThickness() / 2);
+                }
 
                 //
                 // If the value is less or equal to the Minimum
                 if (pRing.Value <= pRing.Minimum)
                 {
-                    if (path != null)
-                    {
-                        pRing.DrawCircle(d, centre, radius, ringThickness, path);
 
-                        path.StrokeThickness = 0;
-                    }
                 }
                 //
                 // Else if the value is between the minimum (with an offset) and the minimum + 1
                 else if (pRing.Value > (pRing.Minimum) && pRing.Value < pRing.Minimum + 1)
                 {
-                    var startPoint = pRing.GetPointAroundRadius(MinAngle, radius, containerCentre);
-                    var oldEndPoint = pRing.GetPointAroundRadius(MinAngle + 0.1, radius, containerCentre);
-                    var endPoint = pRing.GetPointAroundRadius(MinAngle + 0.1, radius, containerCentre);
 
-                    pRing.DrawArc(
-                        d,
-                        path,
-                        startPoint,
-                        oldEndPoint,
-                        endPoint,
-                        new Size(size, size),
-                        pRing.CheckMainArcLargeAngle(pRing.ValueAngle, 0),
-                        SweepDirection.Clockwise,
-                        storyboard,
-                        animX,
-                        animY);
-
-                    path.StrokeThickness = pRing.DrawThicknessTransition(d, pRing.Minimum + 0.01, pRing.Value, pRing.Minimum + 1.01, 0.0, ringThickness, true);
                 }
                 //
                 // Else if the value is greater than or equal to the Maximum
                 else if (pRing.Value >= pRing.Maximum)
                 {
-                    pRing.DrawCircle(d, centre, radius, ringThickness, path);
 
-                    path.StrokeThickness = ringThickness;
                 }
                 //
                 // For any value between Minimum and Maximum
                 else
                 {
-                    var startPoint = pRing.GetPointAroundRadius(MinAngle, radius, containerCentre);
-                    var oldEndPoint = pRing.GetPointAroundRadius(pRing.GetOldValueAngle() - 0.1, radius, containerCentre);
-                    var endPoint = pRing.GetPointAroundRadius(pRing.ValueAngle - 0.1, radius, containerCentre);
-
-                    pRing.DrawArc(
-                        d,
-                        path,
-                        startPoint,
-                        oldEndPoint,
-                        endPoint,
-                        new Size(size, size),
-                        pRing.CheckMainArcLargeAngle(pRing.ValueAngle, 0),
-                        SweepDirection.Clockwise,
-                        storyboard,
-                        animX,
-                        animY);
-
-                    path.StrokeThickness = ringThickness;
+                    
                 }
             }
         }
 
 
 
-        /// <summary>
-        /// Draws the Track ring
-        /// </summary>
-        /// <param name="d">The DependencyObject representing the control.</param>
-        /// <param name="useTransition">Indicates whether to use a transition effect.</param>
-        private static void DrawTrackRing(DependencyObject d, double value, double oldValue, double angle)
-        {
-            var pRing = (PercentageRing)d;
-
-            var path = pRing.GetTrackRingPath();
-
-            Storyboard storyboard = null;
-            DoubleAnimation animX = null;
-            DoubleAnimation animY = null;
-
-            if (path != null)
+            /// <summary>
+            /// Draws the Track ring
+            /// </summary>
+            /// <param name="d">The DependencyObject representing the control.</param>
+            /// <param name="useTransition">Indicates whether to use a transition effect.</param>
+            private static void DrawTrackRing(DependencyObject d, double value, double oldValue, double angle, bool useTransition)
             {
-                var ringThickness = pRing.TrackRingThickness;
-                var containerCentre = pRing.GetContainerCenter();
+                var pRing = (PercentageRing)d;
 
-                var radius = pRing.GetSharedRadius();
-                var gapAngle = pRing.GetGapAngle();
-                var centre = new Point(containerCentre, containerCentre);
+                RingControl trackRing = pRing.GetTrackRingControl();
 
-                var size = radius;
+                if (trackRing != null)
+                {
+
+                if (pRing.CheckMainIsThickest())
+                {
+                    trackRing.Width = pRing.GetContainerSize() - (pRing.GetLargerThickness() / 2);
+                    trackRing.Height = pRing.GetContainerSize() - (pRing.GetLargerThickness() / 2);
+                }
+                else
+                {
+                    trackRing.Width = pRing.GetContainerSize();
+                    trackRing.Height = pRing.GetContainerSize();
+                }
 
                 // If the value is less or equal to the Minimum
                 if (pRing.Value <= pRing.Minimum + 0.1)
                 {
-                    if (path != null)
-                    {
-                        pRing.DrawCircle(d, centre, radius, ringThickness, path);
-
-                        path.StrokeThickness = ringThickness;
-                    }
                 }
                 // Else if the value is between the minimum and the minimum + 1
                 else if (pRing.Value > pRing.Minimum && pRing.Value < pRing.Minimum + 1.01)
                 {
-                    if (path != null)
-                    {
-                        var beginStartAngle = MaxAngle;                     // Initial start angle
-                        var beginEndAngle = MaxAngle - gapAngle;            // Angle when value = 1
-
-                        var endStartAngle = MinAngle;                       // Initial start angle
-                        var endEndAngle = MinAngle + gapAngle;              // Angle when value = 1
-
-                        var adjustedStartAngle = pRing.DrawAdjustedAngle(pRing, pRing.Minimum, pRing.Value, pRing.Minimum + 1, beginStartAngle, beginEndAngle, pRing.ValueAngle, true);
-                        var adjustedEndAngle = pRing.DrawAdjustedAngle(pRing, pRing.Minimum, pRing.Value, pRing.Minimum + 1, endStartAngle, endEndAngle, pRing.ValueAngle, true);
-                        var adjustedOldEndAngle = pRing.DrawAdjustedAngle(pRing, pRing.Minimum, pRing.GetOldValue(), pRing.Minimum + 1, endStartAngle, endEndAngle, pRing.GetOldValueAngle(), true);
-
-                        var startPoint = pRing.GetPointAroundRadius(adjustedStartAngle, radius, containerCentre);
-                        var oldEndPoint = pRing.GetPointAroundRadius(adjustedEndAngle, radius, containerCentre);
-                        var endPoint = pRing.GetPointAroundRadius(adjustedEndAngle, radius, containerCentre);
-
-                        pRing.DrawArc(
-                            d,
-                            path,
-                            startPoint,
-                            oldEndPoint,
-                            endPoint,
-                            new Size(size, size),
-                            pRing.CheckTrackArcLargeAngle(pRing.ValueAngle, gapAngle),
-                            SweepDirection.Counterclockwise,
-                            storyboard,
-                            animX,
-                            animY);
-
-                        path.StrokeThickness = ringThickness;
-                    }
                 }
                 //
                 // Else if the value is greater than or equal to the Maximum
                 else if (pRing.Value >= pRing.Maximum)
                 {
-                    pRing.DrawCircle(d, centre, radius, ringThickness, path);
 
-                    path.StrokeThickness = 0;
-                }                
+                }
                 //
                 // For any value between Minimum and Maximum
                 else
                 {
-                    var startPoint = pRing.GetPointAroundRadius(MinAngle - gapAngle, radius, containerCentre);
-                    var oldEndPoint = pRing.GetPointAroundRadius(pRing.GetOldValueAngle() - gapAngle, radius, containerCentre);
-                    var endPoint = pRing.GetPointAroundRadius(pRing.ValueAngle + gapAngle, radius, containerCentre);
-
-                    //
-                    // Special condition where the value approaches the end of the track
-                    if (pRing.Value > 1 && pRing.ValueAngle > (MaxAngle - (gapAngle * 2)))
-                    {
-                        var endPoint2 = pRing.GetPointAroundRadius((MaxAngle - gapAngle) - 0.1, radius, containerCentre);
-
-                        pRing.DrawArc(
-                            d,
-                            path,
-                            startPoint,
-                            oldEndPoint,
-                            endPoint2,
-                            new Size(size, size),
-                            pRing.CheckTrackArcLargeAngle(pRing.ValueAngle, gapAngle),
-                            SweepDirection.Counterclockwise,
-                            storyboard,
-                            animX,
-                            animY);
-
-                        path.StrokeThickness = pRing.DrawThicknessTransition(d, (MaxAngle - (gapAngle * 2)), pRing.ValueAngle, (MaxAngle - gapAngle), ringThickness, 0.0, true);
-                    }
-                    else
-                    {
-                        pRing.DrawArc(
-                            d,
-                            path,
-                            startPoint,
-                            oldEndPoint,
-                            endPoint,
-                            new Size(size, size),
-                            pRing.CheckTrackArcLargeAngle(pRing.ValueAngle, gapAngle),
-                            SweepDirection.Counterclockwise,
-                            storyboard,
-                            animX,
-                            animY);
-
-                        path.StrokeThickness = ringThickness;
-
-                        path.Visibility = Visibility.Visible;
-                    }                    
                 }
-            }
+                
         }
-
-
-
-        /// <summary>
-        /// Draws an arc segment on a canvas using the specified parameters.
-        /// </summary>
-        /// <param name="d">The DependencyObject representing the control.</param>
-        /// <param name="ringPath">The Path element to which the arc segment is assigned.</param>
-        /// <param name="startPoint">The starting point of the arc.</param>
-        /// <param name="endPoint">The ending point of the arc.</param>
-        /// <param name="size">The size of the arc (width and height).</param>
-        /// <param name="largeArc">Indicates whether the arc should be a large arc.</param>
-        /// <param name="sweepDirection">The direction in which the arc sweeps.</param>
-        private void DrawArc(DependencyObject d, Path ringPath, Point startPoint, Point oldEndPoint, Point endPoint, Size size, bool largeArc, SweepDirection sweepDirection, Storyboard storyboard, DoubleAnimation animX, DoubleAnimation animY)
-        {
-            if (ringPath != null)
-            {
-                var pRing = (PercentageRing)d;
-
-                var pg = new PathGeometry();
-                var pf = new PathFigure
-                {
-                    IsClosed = false,
-                    IsFilled = false,
-                };
-
-                // Sets the start point to the top and center of the canvas
-                pf.StartPoint = startPoint;
-
-                var seg = new ArcSegment
-                {
-                    SweepDirection = sweepDirection,
-                    IsLargeArc = largeArc,
-                    Size = size,
-                    // Sets the end point to an angle, calculated from the value, to a position around the radius of the ring
-                    Point = endPoint,
-                };
-
-                pf.Segments.Add(seg);
-                pg.Figures.Add(pf);
-
-                ringPath.Data = pg;
-
-                if (storyboard != null)
-                {
-                    storyboard.Children.Add(animX);
-                    storyboard.Children.Add(animY);
-
-                    animX.SetValue(Storyboard.TargetPropertyProperty, ringPath);
-                }
-            };
-        }
-
-
-
-        /// <summary>
-        /// Draws a circular path (ellipse) on a canvas using the specified parameters.
-        /// </summary>
-        /// <param name="d">The DependencyObject representing the control.</param>
-        /// <param name="ringCentre">The center point of the circle.</param>
-        /// <param name="ringRadius">The radius of the circle.</param>
-        /// <param name="ringThickness">The thickness of the circle (used for the ellipse geometry).</param>
-        /// <param name="ringPath">The Path element to which the ellipse geometry is assigned.</param>
-        private void DrawCircle(DependencyObject d, Point ringCentre, double ringRadius, double ringThickness, Path ringPath)
-        {
-            if (ringPath != null)
-            {
-                var eg = new EllipseGeometry
-                {
-                    Center = ringCentre,
-                    RadiusX = ringRadius,
-                };
-
-                eg.RadiusY = eg.RadiusX;
-
-                ringPath.Data = eg;
-            };
-        }
-
-
-
-        /// <summary>
-        /// Calculates an interpolated thickness value based on the provided parameters.
-        /// </summary>
-        /// <param name="d">The DependencyObject representing the control.</param>
-        /// <param name="startValue">The starting value for interpolation.</param>
-        /// <param name="value">The current value to interpolate.</param>
-        /// <param name="endValue">The ending value for interpolation.</param>
-        /// <param name="startThickness">The starting thickness value.</param>
-        /// <param name="endThickness">The ending thickness value.</param>
-        /// <param name="useEasing">Indicates whether to apply an easing function.</param>
-        /// <returns>The interpolated thickness value.</returns>
-        private double DrawThicknessTransition(DependencyObject d, double startValue, double value, double endValue, double startThickness, double endThickness, bool useEasing)
-        {
-            // Ensure that value is within the range [startValue, endValue]
-            value = Math.Max(startValue, Math.Min(endValue, value));
-
-            // Calculate the interpolation factor (t) between 0 and 1
-            var t = (value - startValue) / (endValue - startValue);
-
-            double interpolatedThickness;
-
-            if (useEasing)
-            {
-                // Apply an easing function (e.g., quadratic ease-in-out)
-                var easedT = EasingInOutFunction(t);
-
-                // Interpolate the thickness
-                interpolatedThickness = startThickness + easedT * (endThickness - startThickness);
-            }
-            else
-            {
-                // Interpolate the thickness
-                interpolatedThickness = startThickness + t * (endThickness - startThickness);
-            }
-
-            return interpolatedThickness;
-        }
-
-
-
-        /// <summary>
-        /// Calculates an interpolated angle based on the provided parameters.
-        /// </summary>
-        /// <param name="d">The DependencyObject representing the control.</param>
-        /// <param name="startValue">The starting value for interpolation.</param>
-        /// <param name="value">The current value to interpolate.</param>
-        /// <param name="endValue">The ending value for interpolation.</param>
-        /// <param name="startAngle">The starting angle value.</param>
-        /// <param name="endAngle">The ending angle value.</param>
-        /// <param name="valueAngle">The angle corresponding to the current value.</param>
-        /// <param name="useEasing">Indicates whether to apply an easing function.</param>
-        /// <returns>The interpolated angle value.</returns>
-        private double DrawAdjustedAngle(DependencyObject d, double startValue, double value, double endValue, double startAngle, double endAngle, double valueAngle, bool useEasing)
-        {
-            // Ensure that value is within the range [startValue, endValue]
-            value = Math.Max(startValue, Math.Min(endValue, value));
-
-            // Calculate the interpolation factor (t) between 0 and 1
-            var t = (value - startValue) / (endValue - startValue);
-
-            double interpolatedAngle;
-
-            if (useEasing)
-            {
-                // Apply an easing function
-                var easedT = EasingInOutFunction(t);
-
-                // Interpolate the angle
-                interpolatedAngle = startAngle + easedT * (endAngle - startAngle);
-            }
-            else
-            {
-                // Interpolate the angle
-                interpolatedAngle = startAngle + t * (endAngle - startAngle);
-            }
-
-            return interpolatedAngle;
-        }
-
-        #endregion
-
-
-
-        #region 8. Conversion return methods
-
-        /// <summary>
-        /// Calculates a point on a circle given an angle and radius.
-        /// </summary>
-        /// <param name="angle">Angle in degrees.</param>
-        /// <param name="radius">Radius of the circle.</param>
-        /// <param name="centrePoint">Distance from the origin to the center of the circle.</param>
-        /// <returns>A Point representing the (x, y) coordinates of the calculated point.</returns>
-        private Point GetPointAroundRadius(double angle, double radius, double centrePoint)
-        {
-            // Convert angle from degrees to radians
-            var angleInRadians = (Degrees2Radians * angle);
-
-            // Calculate x and y coordinates
-            var x = (centrePoint + (Math.Sin(angleInRadians) * radius));
-            var y = (centrePoint - (Math.Cos(angleInRadians) * radius));
-
-            // Create a Point object with the calculated coordinates
-            return new Point(x, y);
-        }
-
-
-
-        /// <summary>
-        /// Converts a value within a specified range to an angle within another specified range.
-        /// </summary>
-        /// <param name="value">The value to convert.</param>
-        /// <param name="minValue">The minimum value of the input range.</param>
-        /// <param name="maxValue">The maximum value of the input range.</param>
-        /// <param name="minAngle">The minimum angle of the output range (in degrees).</param>
-        /// <param name="maxAngle">The maximum angle of the output range (in degrees).</param>
-        /// <returns>The converted angle.</returns>
-        private double DoubleToAngle(double value, double minValue, double maxValue, double minAngle, double maxAngle)
-        {
-            // If value is below the Minimum set
-            if (value < minValue)
-            {
-                return minAngle;
-            }
-
-            // If value is above the Maximum set
-            if (value > maxValue)
-            {
-                return maxAngle;
-            }
-
-            // Calculate the interpolated angle
-            return ((value - minValue) / (maxValue - minValue) * (maxAngle - minAngle));
-        }
-
-
-
-        /// <summary>
-        /// Converts a value within a specified range to a percentage.
-        /// </summary>
-        /// <param name="value">The value to convert.</param>
-        /// <param name="minValue">The minimum value of the input range.</param>
-        /// <param name="maxValue">The maximum value of the input range.</param>
-        /// <returns>The percentage value (between 0 and 100).</returns>
-        private double DoubleToPercentage(double value, double minValue, double maxValue)
-        {
-            // Ensure value is within the specified range
-            if (value < minValue)
-            {
-                return 0.0; // Below the range
-            }
-            else if (value > maxValue)
-            {
-                return 100.0; // Above the range
-            }
-            else
-            {
-                // Calculate the normalized value
-                var normalizedValue = (value - minValue) / (maxValue - minValue);
-
-                // Convert to percentage
-                var percentage = normalizedValue * 100.0;
-
-                return percentage;
-            }
-        }
-
-
-
-        /// <summary>
-        /// Converts a percentage value to a formatted string.
-        /// </summary>
-        /// <param name="percent">The percentage value.</param>
-        /// <param name="minValue">The minimum value.</param>
-        /// <param name="maxValue">The maximum value.</param>
-        /// <returns>A formatted string representing the percentage.</returns>
-        private string GetPercentageString(double percent, double minValue, double maxValue)
-        {
-            var rounded = DoubleToPercentage(percent, minValue, maxValue);
-
-            return Math.Round(rounded, 0).ToString() + "%";
-        }
-
-
-
-        /// <summary>
-        /// Calculates the total angle needed to accommodate a gap between two strokes around a circle.
-        /// </summary>
-        /// <param name="thicknessA">The Thickness radius to measure.</param>
-        /// <param name="radius">The radius of the rings.</param>
-        /// <returns>The gap angle (sum of angles for the larger and smaller strokes).</returns>
-        private double GapThicknessToAngle(double radius, double thickness)
-        {
-            if (radius > 0 && thickness > 0)
-            {
-                // Calculate the maximum number of circles
-                double n = Math.PI * (radius / thickness);
-
-                // Calculate the angle between each small circle
-                double angle = 360.0 / n;
-
-                return angle;
-            }            
-            return 0;
-        }
-
-
-
-        /// <summary>
-        /// Calculates the modulus of a number with respect to a divider.
-        /// The result is always positive or zero, regardless of the input values.
-        /// </summary>
-        /// <param name="number">The input number.</param>
-        /// <param name="divider">The divider (non-zero).</param>
-        /// <returns>The positive modulus result.</returns>
-        private double Modulus(double number, double divider)
-        {
-            // Calculate the modulus
-            var result = number % divider;
-
-            // Ensure the result is positive or zero
-            result = result < 0 ? result + divider : result;
-
-            return result;
-        }
-
-
-
-        /// <summary>
-        /// Checks if the provided angle and gapAngle is greater than 180 degrees
-        /// </summary>
-        /// <param name="angle">The angle we want to compare (in degrees).</param>
-        /// <param name="gapAngle">The gap angle we may need to account for (in degrees).</param>
-        /// <returns>A boolean True if the angle is greater than 180 degrees</returns>
-        private bool CheckMainArcLargeAngle(double angle, double gapAngle)
-        {
-            return angle > 180.0;
-        }
-
-
-
-        /// <summary>
-        /// Checks if the provided angle is less than 180 degrees minus the gapAngle
-        /// </summary>
-        /// <param name="angle">The angle we want to compare (in degrees).</param>
-        /// <param name="gapAngle">The gap angle we may need to account for (in degrees).</param>
-        /// <returns>A boolean True if the angle is less than 180 degrees - minus two times the gapAngle</returns>
-        private bool CheckTrackArcLargeAngle(double angle, double gapAngle)
-        {
-            return angle + (gapAngle * 2) < 180.0;
-        }
-
-
-
-        /// <summary>
-        /// Calculates an adjusted angle using linear interpolation (lerp) between the start and end angles.
-        /// </summary>
-        /// <param name="startAngle">The initial angle.</param>
-        /// <param name="endAngle">The final angle.</param>
-        /// <param name="valueAngle">A value between 0 and 1 representing the interpolation factor.</param>
-        /// <returns>The adjusted angle based on linear interpolation.</returns>
-        private static double GetInterpolatedAngle(double startAngle, double endAngle, double valueAngle)
-        {
-            // Linear interpolation formula (lerp): GetInterpolatedAngle = (startAngle + valueAngle) * (endAngle - startAngle)
-            return (startAngle + valueAngle) * (endAngle - startAngle);
-        }
-
-
-
-        /// <summary>
-        /// Example quadratic ease-in-out function
-        /// </summary>
-        private double EasingInOutFunction(double t)
-        {
-            return t < 0.5 ? 2 * t * t : 1 - Math.Pow(-2 * t + 2, 2) / 2;
-        }
-
-
-
-        /// <summary>
-        /// Example ease-out cubic function
-        /// </summary>
-        static double EaseOutCubic(double t)
-        {
-            return 1.0 - Math.Pow(1.0 - t, 3.0);
-        }
-
-        #endregion
     }
-}
+
+
+
+            /// <summary>
+            /// Draws an arc segment on a canvas using the specified parameters.
+            /// </summary>
+            /// <param name="d">The DependencyObject representing the control.</param>
+            /// <param name="ringPath">The Path element to which the arc segment is assigned.</param>
+            /// <param name="startPoint">The starting point of the arc.</param>
+            /// <param name="endPoint">The ending point of the arc.</param>
+            /// <param name="size">The size of the arc (width and height).</param>
+            /// <param name="largeArc">Indicates whether the arc should be a large arc.</param>
+            /// <param name="sweepDirection">The direction in which the arc sweeps.</param>
+            private void DrawArc(DependencyObject d, Path ringPath, Point startPoint, Point oldEndPoint, Point endPoint, Size size, bool largeArc, SweepDirection sweepDirection, Storyboard storyboard, DoubleAnimation animX, DoubleAnimation animY)
+            {
+                if (ringPath != null)
+                {
+                    var pRing = (PercentageRing)d;
+
+                    var pg = new PathGeometry();
+                    var pf = new PathFigure
+                    {
+                        IsClosed = false,
+                        IsFilled = false,
+                    };
+
+                    // Sets the start point to the top and center of the canvas
+                    pf.StartPoint = startPoint;
+
+                    var seg = new ArcSegment
+                    {
+                        SweepDirection = sweepDirection,
+                        IsLargeArc = largeArc,
+                        Size = size,
+                        // Sets the end point to an angle, calculated from the value, to a position around the radius of the ring
+                        Point = endPoint,
+                    };
+
+                    pf.Segments.Add(seg);
+                    pg.Figures.Add(pf);
+
+                    ringPath.Data = pg;
+
+                    if (storyboard != null)
+                    {
+                        storyboard.Children.Add(animX);
+                        storyboard.Children.Add(animY);
+
+                        animX.SetValue(Storyboard.TargetPropertyProperty, ringPath);
+                    }
+                };
+            }
+
+
+
+            /// <summary>
+            /// Draws a circular path (ellipse) on a canvas using the specified parameters.
+            /// </summary>
+            /// <param name="d">The DependencyObject representing the control.</param>
+            /// <param name="ringCentre">The center point of the circle.</param>
+            /// <param name="ringRadius">The radius of the circle.</param>
+            /// <param name="ringThickness">The thickness of the circle (used for the ellipse geometry).</param>
+            /// <param name="ringPath">The Path element to which the ellipse geometry is assigned.</param>
+            private void DrawCircle(DependencyObject d, Point ringCentre, double ringRadius, double ringThickness, Path ringPath)
+            {
+                if (ringPath != null)
+                {
+                    var eg = new EllipseGeometry
+                    {
+                        Center = ringCentre,
+                        RadiusX = ringRadius,
+                    };
+
+                    eg.RadiusY = eg.RadiusX;
+
+                    ringPath.Data = eg;
+                };
+            }
+
+
+
+            /// <summary>
+            /// Calculates an interpolated thickness value based on the provided parameters.
+            /// </summary>
+            /// <param name="d">The DependencyObject representing the control.</param>
+            /// <param name="startValue">The starting value for interpolation.</param>
+            /// <param name="value">The current value to interpolate.</param>
+            /// <param name="endValue">The ending value for interpolation.</param>
+            /// <param name="startThickness">The starting thickness value.</param>
+            /// <param name="endThickness">The ending thickness value.</param>
+            /// <param name="useEasing">Indicates whether to apply an easing function.</param>
+            /// <returns>The interpolated thickness value.</returns>
+            private double DrawThicknessTransition(DependencyObject d, double startValue, double value, double endValue, double startThickness, double endThickness, bool useEasing)
+            {
+                // Ensure that value is within the range [startValue, endValue]
+                value = Math.Max(startValue, Math.Min(endValue, value));
+
+                // Calculate the interpolation factor (t) between 0 and 1
+                var t = (value - startValue) / (endValue - startValue);
+
+                double interpolatedThickness;
+
+                if (useEasing)
+                {
+                    // Apply an easing function (e.g., quadratic ease-in-out)
+                    var easedT = EasingInOutFunction(t);
+
+                    // Interpolate the thickness
+                    interpolatedThickness = startThickness + easedT * (endThickness - startThickness);
+                }
+                else
+                {
+                    // Interpolate the thickness
+                    interpolatedThickness = startThickness + t * (endThickness - startThickness);
+                }
+
+                return interpolatedThickness;
+            }
+
+
+
+            /// <summary>
+            /// Calculates an interpolated angle based on the provided parameters.
+            /// </summary>
+            /// <param name="d">The DependencyObject representing the control.</param>
+            /// <param name="startValue">The starting value for interpolation.</param>
+            /// <param name="value">The current value to interpolate.</param>
+            /// <param name="endValue">The ending value for interpolation.</param>
+            /// <param name="startAngle">The starting angle value.</param>
+            /// <param name="endAngle">The ending angle value.</param>
+            /// <param name="valueAngle">The angle corresponding to the current value.</param>
+            /// <param name="useEasing">Indicates whether to apply an easing function.</param>
+            /// <returns>The interpolated angle value.</returns>
+            private double DrawAdjustedAngle(DependencyObject d, double startValue, double value, double endValue, double startAngle, double endAngle, double valueAngle, bool useEasing)
+            {
+                // Ensure that value is within the range [startValue, endValue]
+                value = Math.Max(startValue, Math.Min(endValue, value));
+
+                // Calculate the interpolation factor (t) between 0 and 1
+                var t = (value - startValue) / (endValue - startValue);
+
+                double interpolatedAngle;
+
+                if (useEasing)
+                {
+                    // Apply an easing function
+                    var easedT = EasingInOutFunction(t);
+
+                    // Interpolate the angle
+                    interpolatedAngle = startAngle + easedT * (endAngle - startAngle);
+                }
+                else
+                {
+                    // Interpolate the angle
+                    interpolatedAngle = startAngle + t * (endAngle - startAngle);
+                }
+
+                return interpolatedAngle;
+            }
+
+            #endregion
+
+
+
+            #region 8. Conversion return methods
+
+            /// <summary>
+            /// Calculates a point on a circle given an angle and radius.
+            /// </summary>
+            /// <param name="angle">Angle in degrees.</param>
+            /// <param name="radius">Radius of the circle.</param>
+            /// <param name="centrePoint">Distance from the origin to the center of the circle.</param>
+            /// <returns>A Point representing the (x, y) coordinates of the calculated point.</returns>
+            private Point GetPointAroundRadius(double angle, double radius, double centrePoint)
+            {
+                // Convert angle from degrees to radians
+                var angleInRadians = (Degrees2Radians * angle);
+
+                // Calculate x and y coordinates
+                var x = (centrePoint + (Math.Sin(angleInRadians) * radius));
+                var y = (centrePoint - (Math.Cos(angleInRadians) * radius));
+
+                // Create a Point object with the calculated coordinates
+                return new Point(x, y);
+            }
+
+
+
+            /// <summary>
+            /// Converts a value within a specified range to an angle within another specified range.
+            /// </summary>
+            /// <param name="value">The value to convert.</param>
+            /// <param name="minValue">The minimum value of the input range.</param>
+            /// <param name="maxValue">The maximum value of the input range.</param>
+            /// <param name="minAngle">The minimum angle of the output range (in degrees).</param>
+            /// <param name="maxAngle">The maximum angle of the output range (in degrees).</param>
+            /// <returns>The converted angle.</returns>
+            private double DoubleToAngle(double value, double minValue, double maxValue, double minAngle, double maxAngle)
+            {
+                // If value is below the Minimum set
+                if (value < minValue)
+                {
+                    return minAngle;
+                }
+
+                // If value is above the Maximum set
+                if (value > maxValue)
+                {
+                    return maxAngle;
+                }
+
+                // Calculate the interpolated angle
+                return ((value - minValue) / (maxValue - minValue) * (maxAngle - minAngle));
+            }
+
+
+
+            /// <summary>
+            /// Converts a value within a specified range to a percentage.
+            /// </summary>
+            /// <param name="value">The value to convert.</param>
+            /// <param name="minValue">The minimum value of the input range.</param>
+            /// <param name="maxValue">The maximum value of the input range.</param>
+            /// <returns>The percentage value (between 0 and 100).</returns>
+            private double DoubleToPercentage(double value, double minValue, double maxValue)
+            {
+                // Ensure value is within the specified range
+                if (value < minValue)
+                {
+                    return 0.0; // Below the range
+                }
+                else if (value > maxValue)
+                {
+                    return 100.0; // Above the range
+                }
+                else
+                {
+                    // Calculate the normalized value
+                    var normalizedValue = (value - minValue) / (maxValue - minValue);
+
+                    // Convert to percentage
+                    var percentage = normalizedValue * 100.0;
+
+                    return percentage;
+                }
+            }
+
+
+
+            /// <summary>
+            /// Converts a percentage value to a formatted string.
+            /// </summary>
+            /// <param name="percent">The percentage value.</param>
+            /// <param name="minValue">The minimum value.</param>
+            /// <param name="maxValue">The maximum value.</param>
+            /// <returns>A formatted string representing the percentage.</returns>
+            private string GetPercentageString(double percent, double minValue, double maxValue)
+            {
+                var rounded = DoubleToPercentage(percent, minValue, maxValue);
+
+                return Math.Round(rounded, 0).ToString() + "%";
+            }
+
+
+
+            /// <summary>
+            /// Calculates the total angle needed to accommodate a gap between two strokes around a circle.
+            /// </summary>
+            /// <param name="thicknessA">The Thickness radius to measure.</param>
+            /// <param name="radius">The radius of the rings.</param>
+            /// <returns>The gap angle (sum of angles for the larger and smaller strokes).</returns>
+            private double GapThicknessToAngle(double radius, double thickness)
+            {
+                if (radius > 0 && thickness > 0)
+                {
+                    // Calculate the maximum number of circles
+                    double n = Math.PI * (radius / thickness);
+
+                    // Calculate the angle between each small circle
+                    double angle = 360.0 / n;
+
+                    return angle;
+                }
+                return 0;
+            }
+
+
+
+            /// <summary>
+            /// Calculates the modulus of a number with respect to a divider.
+            /// The result is always positive or zero, regardless of the input values.
+            /// </summary>
+            /// <param name="number">The input number.</param>
+            /// <param name="divider">The divider (non-zero).</param>
+            /// <returns>The positive modulus result.</returns>
+            private double Modulus(double number, double divider)
+            {
+                // Calculate the modulus
+                var result = number % divider;
+
+                // Ensure the result is positive or zero
+                result = result < 0 ? result + divider : result;
+
+                return result;
+            }
+
+
+
+            /// <summary>
+            /// Checks if the provided angle and gapAngle is greater than 180 degrees
+            /// </summary>
+            /// <param name="angle">The angle we want to compare (in degrees).</param>
+            /// <param name="gapAngle">The gap angle we may need to account for (in degrees).</param>
+            /// <returns>A boolean True if the angle is greater than 180 degrees</returns>
+            private bool CheckMainArcLargeAngle(double angle, double gapAngle)
+            {
+                return angle > 180.0;
+            }
+
+
+
+            /// <summary>
+            /// Checks if the provided angle is less than 180 degrees minus the gapAngle
+            /// </summary>
+            /// <param name="angle">The angle we want to compare (in degrees).</param>
+            /// <param name="gapAngle">The gap angle we may need to account for (in degrees).</param>
+            /// <returns>A boolean True if the angle is less than 180 degrees - minus two times the gapAngle</returns>
+            private bool CheckTrackArcLargeAngle(double angle, double gapAngle)
+            {
+                return angle + (gapAngle * 2) < 180.0;
+            }
+
+
+
+            /// <summary>
+            /// Calculates an adjusted angle using linear interpolation (lerp) between the start and end angles.
+            /// </summary>
+            /// <param name="startAngle">The initial angle.</param>
+            /// <param name="endAngle">The final angle.</param>
+            /// <param name="valueAngle">A value between 0 and 1 representing the interpolation factor.</param>
+            /// <returns>The adjusted angle based on linear interpolation.</returns>
+            private static double GetInterpolatedAngle(double startAngle, double endAngle, double valueAngle)
+            {
+                // Linear interpolation formula (lerp): GetInterpolatedAngle = (startAngle + valueAngle) * (endAngle - startAngle)
+                return (startAngle + valueAngle) * (endAngle - startAngle);
+            }
+
+
+
+            /// <summary>
+            /// Example quadratic ease-in-out function
+            /// </summary>
+            private double EasingInOutFunction(double t)
+            {
+                return t < 0.5 ? 2 * t * t : 1 - Math.Pow(-2 * t + 2, 2) / 2;
+            }
+
+
+
+            /// <summary>
+            /// Example ease-out cubic function
+            /// </summary>
+            static double EaseOutCubic(double t)
+            {
+                return 1.0 - Math.Pow(1.0 - t, 3.0);
+            }
+
+            #endregion
+        }
+    }

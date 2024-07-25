@@ -13,7 +13,7 @@ using Windows.ApplicationModel.Appointments.DataProvider;
 
 namespace StorageControls
 {
-    public partial class PercentageRing : Control
+    public partial class PercentageRing : RangeBase
     {
         #region Dependency Property Registration
 
@@ -105,36 +105,6 @@ namespace StorageControls
                 typeof(double),
                 typeof(PercentageRing),
                 new PropertyMetadata(1.0, OnRingThicknessChanged));
-
-        /// <summary>
-        /// Identifies the Value dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ValueProperty =
-            DependencyProperty.Register(
-                nameof(Value), 
-                typeof(double), 
-                typeof(PercentageRing), 
-                new PropertyMetadata(12.0, OnValueChanged));
-
-        /// <summary>
-        /// Identifies the Minimum dependency property.
-        /// </summary>
-        public static readonly DependencyProperty MinimumProperty =
-            DependencyProperty.Register(
-                nameof(Minimum),
-                typeof(double),
-                typeof(PercentageRing),
-                new PropertyMetadata(0.0, OnMinimumChanged));
-
-        /// <summary>
-        /// Identifies the Maximum dependency property.
-        /// </summary>
-        public static readonly DependencyProperty MaximumProperty =
-            DependencyProperty.Register(
-                nameof(Maximum),
-                typeof(double),
-                typeof(PercentageRing),
-                new PropertyMetadata(100.0, OnMaximumChanged));
 
         /// <summary>
         /// Identifies the ValueAngle dependency property.
@@ -256,33 +226,6 @@ namespace StorageControls
             set { SetValue(TrackRingThicknessProperty, value); }
         }
 
-        /// <summary>
-        /// Gets or sets the Value.
-        /// </summary>
-        public double Value
-        {
-            get { return (double)GetValue(ValueProperty); }
-            set { SetValue(ValueProperty, value); }
-        }
-
-        /// <summary>
-        /// Gets or sets the Minimum.
-        /// </summary>
-        public double Minimum
-        {
-            get { return (double)GetValue(MinimumProperty); }
-            set { SetValue(MinimumProperty, value); }
-        }
-
-        /// <summary>
-        /// Gets or sets the Maximum.
-        /// </summary>
-        public double Maximum
-        {
-            get { return (double)GetValue(MaximumProperty); }
-            set { SetValue(MaximumProperty, value); }
-        }
-
         #endregion
 
 
@@ -364,47 +307,15 @@ namespace StorageControls
             }
         }
 
-        /// <summary>
-        /// Handles the change in Value property.
-        /// </summary>
-        /// <param name="d">The DependencyObject representing the control.</param>
-        /// <param name="e">The event arguments containing the old and new values.</param>
-        private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        /// <inheritdoc/>
+        protected override void OnValueChanged(double oldValue, double newValue)
         {
-            if (e.OldValue != e.NewValue)
-            {
-                var pRing = d as PercentageRing;
+            SetOldValue(oldValue);
+            SetOldValueAngle(DoubleToAngle(oldValue, Minimum, Maximum, MinAngle, MaxAngle));   
 
-                pRing.ValueChanged(d, (double)e.OldValue, (double)e.NewValue);
-            }
-        }
+            base.OnValueChanged(oldValue, newValue);
 
-
-        /// <summary>
-        /// Handles the change in Minimum value property.
-        /// </summary>
-        /// <param name="d">The DependencyObject representing the control.</param>
-        /// <param name="e">The event arguments containing the old and new values.</param>
-        private static void OnMinimumChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (e.OldValue != e.NewValue)
-            {
-                var pRing = d as PercentageRing;
-            }
-        }
-
-
-        /// <summary>
-        /// Handles the change in Maximum value property.
-        /// </summary>
-        /// <param name="d">The DependencyObject representing the control.</param>
-        /// <param name="e">The event arguments containing the old and new values.</param>
-        private static void OnMaximumChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (e.OldValue != e.NewValue)
-            {
-                var pRing = d as PercentageRing;
-            }
+            OnValueChanged(this);
         }
 
         #endregion

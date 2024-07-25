@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Shapes;
 using System;
@@ -7,33 +8,30 @@ using System;
 namespace StorageControls
 {
     [TemplatePart(Name = ContainerPartName, Type = typeof(Grid))]
-    [TemplatePart(Name = MainPartName, Type = typeof(Path))]
-    [TemplatePart(Name = TrackPartName, Type = typeof(Path))]
+    [TemplatePart(Name = MainRingControlPartName, Type = typeof(RingControl))]
+    [TemplatePart(Name = TrackRingControlPartName, Type = typeof(RingControl))]
 
-    [TemplatePart(Name = MainStoryboardPartName, Type = typeof(Storyboard))]
-    [TemplatePart(Name = MainAnimationXPartName, Type = typeof(DoubleAnimation))]
-    [TemplatePart(Name = MainAnimationYPartName, Type = typeof(DoubleAnimation))]
+    [TemplatePart(Name = StoryboardPartName, Type = typeof(Storyboard))]
 
-    [TemplatePart(Name = TrackStoryboardPartName, Type = typeof(Storyboard))]
-    [TemplatePart(Name = TrackAnimationXPartName, Type = typeof(DoubleAnimation))]
-    [TemplatePart(Name = TrackAnimationYPartName, Type = typeof(DoubleAnimation))]
+    [TemplatePart(Name = MainStartAnimationPartName, Type = typeof(DoubleAnimation))]
+    [TemplatePart(Name = MainEndAnimationPartName, Type = typeof(DoubleAnimation))]
 
-    public partial class PercentageRing : Control
+    [TemplatePart(Name = TrackStartAnimationPartName, Type = typeof(DoubleAnimation))]
+    [TemplatePart(Name = TrackEndAnimationPartName, Type = typeof(DoubleAnimation))]
+
+    public partial class PercentageRing : RangeBase
     {
         internal const string ContainerPartName = "PART_Container";
-        internal const string MainPartName = "PART_Main";
-        internal const string TrackPartName = "PART_Track";
+        internal const string MainRingControlPartName = "PART_MainRingControl";
+        internal const string TrackRingControlPartName = "PART_TrackRingControl";
 
-        internal const string MainStoryboardPartName = "PART_MainStoryboard";
-        internal const string MainAnimationXPartName = "PART_MainAnimationX";
-        internal const string MainAnimationYPartName = "PART_MainAnimationY";
+        internal const string StoryboardPartName = "PART_Storyboard";
 
-        internal const string TrackStoryboardPartName = "PART_TrackStoryboard";
-        internal const string TrackAnimationXPartName = "PART_TrackAnimationX";
-        internal const string TrackAnimationYPartName = "PART_TrackAnimationY";
+        internal const string MainStartAnimationPartName = "PART_MainStartDoubleAnimation";
+        internal const string MainEndAnimationPartName = "PART_MainEndDoubleAnimation";
 
-        internal const string MainArcName = "ARC_Main";
-        internal const string TrackArcName = "ARC_Track";
+        internal const string TrackStartAnimationPartName = "PART_TrackStartDoubleAnimation";
+        internal const string TrackEndAnimationPartName = "PART_TrackEndDoubleAnimation";
 
         internal const double Degrees2Radians = Math.PI / 180;
         internal const double MaxAngle = 360;

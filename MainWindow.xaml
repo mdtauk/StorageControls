@@ -9,7 +9,7 @@
         <MicaBackdrop Kind="Base" />
     </Window.SystemBackdrop>
 
-    <Grid Padding="0,64,0,0">
+    <Grid x:Name="WindowGrid" Padding="0,64,0,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
@@ -21,26 +21,61 @@
                     Orientation="Horizontal"
                     Spacing="32">
             <local:PercentageRing Width="80"
-                                     Height="80"
-                                     Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
-            
+                                  Height="80"
+                                  Value="{x:Bind valueTest.Value, Mode=TwoWay}" />
+
             <local:PercentageRing Width="32"
-                                     Height="128"
-                                     Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
+                                  Height="128"
+                                  Value="{x:Bind valueTest.Value, Mode=TwoWay}" />
 
             <local:PercentageRing Width="240"
-                                     Height="{x:Bind HeightTest.Value, Mode=OneWay}"
-                                     MainRingThickness="{x:Bind MainThickness.Value, Mode=TwoWay}"
-                                     Maximum="90"
-                                     Minimum="10"
-                                     TrackRingThickness="{x:Bind TrackThickness.Value, Mode=TwoWay}"
-                                     Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
+                                  Height="{x:Bind HeightTest.Value, Mode=OneWay}"
+                                  MainRingThickness="{x:Bind MainThickness.Value, Mode=TwoWay}"
+                                  Maximum="90"
+                                  Minimum="10"
+                                  TrackRingThickness="{x:Bind TrackThickness.Value, Mode=TwoWay}"
+                                  Value="{x:Bind valueTest.Value, Mode=TwoWay}" />
 
             <local:PercentageRing Width="64"
-                                     Height="48"
-                                     MainRingThickness="{x:Bind MainThickness.Value, Mode=TwoWay}"
-                                     TrackRingThickness="{x:Bind TrackThickness.Value, Mode=TwoWay}"
-                                     Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
+                                  Height="48"
+                                  MainRingThickness="{x:Bind MainThickness.Value, Mode=TwoWay}"
+                                  TrackRingThickness="{x:Bind TrackThickness.Value, Mode=TwoWay}"
+                                  Value="{x:Bind valueTest.Value, Mode=TwoWay}" />
+
+            <Border Width="128"
+                    Height="128"
+                    Background="DarkBlue">
+
+                <local:RingControl x:Name="testRing"
+                                   Width="128"
+                                   Height="128"
+                                   EndAngle="360"
+                                   StartAngle="0"
+                                   Stroke="Red"
+                                   StrokeEndLineCap="Triangle"
+                                   StrokeStartLineCap="Flat"
+                                   StrokeThickness="12" />
+
+            </Border>
+
+            <Border Width="64"
+                    Height="64"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="DarkGreen">
+
+                <local:RingControl x:Name="testRingTwo"
+                                   Width="64"
+                                   Height="64"
+                                   Direction="Counterclockwise"
+                                   EndAngle="270"
+                                   StartAngle="-10"
+                                   Stroke="Yellow"
+                                   StrokeEndLineCap="Triangle"
+                                   StrokeStartLineCap="Flat"
+                                   StrokeThickness="12" />
+
+            </Border>
 
             <local:PercentageRing Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
         </StackPanel>
@@ -48,10 +83,10 @@
         <Slider x:Name="testSlider"
                 Grid.Row="0"
                 Width="480"
-                Value="25.00"
+                LargeChange="10"
                 SmallChange="0.1"
                 TickFrequency="0.1"
-                LargeChange="10"/>
+                Value="25.00" />
 
         <Grid Grid.Row="2"
               Padding="32,0,32,64"
@@ -61,10 +96,11 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <StackPanel Orientation="Vertical" Spacing="24">
+            <StackPanel Grid.Column="0"
+                        Orientation="Vertical"
+                        Spacing="24">
                 <NumberBox x:Name="HeightTest"
                            Width="320"
-                           Grid.Column="0"
                            Margin="16,0"
                            Header="Height"
                            Maximum="320"
@@ -74,7 +110,6 @@
 
                 <NumberBox x:Name="TrackThickness"
                            Width="320"
-                           Grid.Column="0"
                            Margin="16,0"
                            Header="Track Thickness"
                            Maximum="40"
@@ -83,16 +118,30 @@
                            Value="10" />
             </StackPanel>
 
-            <NumberBox x:Name="MainThickness"
-                       Width="320"
-                       Grid.Column="1"
-                       Margin="16,0"
-                       VerticalAlignment="Bottom"
-                       Header="Main Thickness"
-                       Maximum="40"
-                       Minimum="1"
-                       SpinButtonPlacementMode="Inline"
-                       Value="30" />
+            <StackPanel Grid.Column="1"
+                        Orientation="Vertical"
+                        Spacing="24">
+
+                <NumberBox x:Name="MainThickness"
+                           Width="320"
+                           Margin="16,0"
+                           VerticalAlignment="Bottom"
+                           Header="Main Thickness"
+                           Maximum="40"
+                           Minimum="1"
+                           SpinButtonPlacementMode="Inline"
+                           Value="30" />
+
+                <NumberBox x:Name="valueTest"
+                           Width="320"
+                           Margin="16,0"
+                           VerticalAlignment="Bottom"
+                           Header="Value"
+                           Maximum="100"
+                           Minimum="0"
+                           SpinButtonPlacementMode="Inline"
+                           Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
+            </StackPanel>
         </Grid>
     </Grid>
 </Window>
