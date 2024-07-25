@@ -12,7 +12,7 @@
         <Setter Property="Height" Value="16" />
         <Setter Property="Width" Value="16" />
         <Setter Property="MainRingBrush" Value="{ThemeResource AccentFillColorDefaultBrush}" />
-        <Setter Property="TrackRingBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}" />
+        <Setter Property="TrackRingBrush" Value="{ThemeResource ControlStrongStrokeColorDefaultBrush}" />
         <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="MainRingThickness" Value="3" />
@@ -27,33 +27,17 @@
                     <Grid Width="{TemplateBinding Width}"
                           Height="{TemplateBinding Height}"
                           Padding="{TemplateBinding Padding}"
+                          Background="Transparent"
                           BorderThickness="{TemplateBinding BorderThickness}">
                         <Grid.Resources>
                             <Storyboard x:Name="PART_Storyboard"
                                         FillBehavior="HoldEnd"
-                                        Duration="0:0:0.5">
-                                <DoubleAnimation x:Name="PART_MainStartDoubleAnimation"
-                                                 EnableDependentAnimation="True"
-                                                 Storyboard.TargetName="PART_MainRingControl"
-                                                 Storyboard.TargetProperty="(RingControl.StartAngle)">
-                                    <DoubleAnimation.EasingFunction>
-                                        <CubicEase />
-                                    </DoubleAnimation.EasingFunction>
-                                </DoubleAnimation>
+                                        Duration="0:0:0.333">
 
                                 <DoubleAnimation x:Name="PART_MainEndDoubleAnimation"
                                                  EnableDependentAnimation="True"
                                                  Storyboard.TargetName="PART_MainRingControl"
                                                  Storyboard.TargetProperty="(RingControl.EndAngle)">
-                                    <DoubleAnimation.EasingFunction>
-                                        <CubicEase />
-                                    </DoubleAnimation.EasingFunction>
-                                </DoubleAnimation>
-
-                                <DoubleAnimation x:Name="PART_TrackStartDoubleAnimation"
-                                                 EnableDependentAnimation="True"
-                                                 Storyboard.TargetName="PART_TrackRingControl"
-                                                 Storyboard.TargetProperty="(RingControl.StartAngle)">
                                     <DoubleAnimation.EasingFunction>
                                         <CubicEase />
                                     </DoubleAnimation.EasingFunction>
@@ -72,7 +56,16 @@
 
                         <Grid x:Name="PART_Container"
                               HorizontalAlignment="Center"
-                              VerticalAlignment="Center">
+                              VerticalAlignment="Center"
+                              Background="{TemplateBinding Background}">
+                            <local:RingControl x:Name="PART_MainRingControl"
+                                               EndAngle="179"
+                                               StartAngle="0"
+                                               Stroke="{TemplateBinding MainRingBrush}"
+                                               StrokeEndLineCap="{TemplateBinding MainRingEndCap}"
+                                               StrokeLineJoin="Round"
+                                               StrokeStartLineCap="{TemplateBinding MainRingStartCap}" />
+
                             <local:RingControl x:Name="PART_TrackRingControl"
                                                Direction="Counterclockwise"
                                                EndAngle="30"
@@ -80,17 +73,8 @@
                                                Stroke="{TemplateBinding TrackRingBrush}"
                                                StrokeEndLineCap="{TemplateBinding TrackRingEndCap}"
                                                StrokeLineJoin="Round"
-                                               StrokeStartLineCap="{TemplateBinding TrackRingStartCap}"
-                                               StrokeThickness="{TemplateBinding TrackRingThickness}" />
+                                               StrokeStartLineCap="{TemplateBinding TrackRingStartCap}" />
 
-                            <local:RingControl x:Name="PART_MainRingControl"
-                                               EndAngle="179"
-                                               StartAngle="0"
-                                               Stroke="{TemplateBinding MainRingBrush}"
-                                               StrokeEndLineCap="{TemplateBinding MainRingEndCap}"
-                                               StrokeLineJoin="Round"
-                                               StrokeStartLineCap="{TemplateBinding MainRingStartCap}"
-                                               StrokeThickness="{TemplateBinding MainRingThickness}" />
                         </Grid>
                     </Grid>
                 </ControlTemplate>

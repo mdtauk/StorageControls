@@ -20,6 +20,7 @@
                     HorizontalAlignment="Center"
                     Orientation="Horizontal"
                     Spacing="32">
+            <!-- 
             <local:PercentageRing Width="80"
                                   Height="80"
                                   Value="{x:Bind valueTest.Value, Mode=TwoWay}" />
@@ -27,21 +28,26 @@
             <local:PercentageRing Width="32"
                                   Height="128"
                                   Value="{x:Bind valueTest.Value, Mode=TwoWay}" />
+            -->
 
             <local:PercentageRing Width="240"
+                                  x:Name="testRingA"
                                   Height="{x:Bind HeightTest.Value, Mode=OneWay}"
                                   MainRingThickness="{x:Bind MainThickness.Value, Mode=TwoWay}"
                                   Maximum="90"
                                   Minimum="10"
+                                  SmallChange="0.1"
+                                  LargeChange="10"
                                   TrackRingThickness="{x:Bind TrackThickness.Value, Mode=TwoWay}"
                                   Value="{x:Bind valueTest.Value, Mode=TwoWay}" />
-
+            <!--
             <local:PercentageRing Width="64"
                                   Height="48"
                                   MainRingThickness="{x:Bind MainThickness.Value, Mode=TwoWay}"
                                   TrackRingThickness="{x:Bind TrackThickness.Value, Mode=TwoWay}"
                                   Value="{x:Bind valueTest.Value, Mode=TwoWay}" />
 
+            
             <Border Width="128"
                     Height="128"
                     Background="DarkBlue">
@@ -78,13 +84,14 @@
             </Border>
 
             <local:PercentageRing Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
+            -->
         </StackPanel>
 
         <Slider x:Name="testSlider"
                 Grid.Row="0"
                 Width="480"
-                LargeChange="10"
-                SmallChange="0.1"
+                LargeChange="{x:Bind testRingA.LargeChange}"
+                SmallChange="{x:Bind testRingA.SmallChange}"
                 TickFrequency="0.1"
                 Value="25.00" />
 

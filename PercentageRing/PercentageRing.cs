@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Microsoft.UI;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
@@ -32,9 +33,7 @@ namespace StorageControls
         RingControl         _trackRingControl;              // Reference to the Track RingControl
 
         Storyboard          _storyboard;                    // Stores a reference to the control Storyboard
-        DoubleAnimation     _mainStartDoubleAnimation;      // Stores a reference to the Main StartAngle Ring Animation
         DoubleAnimation     _mainEndDoubleAnimation;        // Stores a reference to the Main Ring EndAngle Animation
-        DoubleAnimation     _trackStartDoubleAnimation;     // Stores a reference to the Track StartAngle Ring Animation
         DoubleAnimation     _trackEndDoubleAnimation;       // Stores a reference to the Track EndAngle Ring Animation
 
         RectangleGeometry   _clipRect;                      // Clipping RectangleGeometry for the canvas
@@ -176,27 +175,11 @@ namespace StorageControls
         }
 
         /// <summary>
-        /// Sets the private Main StartPoint DoubleAnimation reference
-        /// </summary>
-        void SetMainStartDoubleAnimation(DoubleAnimation doubleAnimation)
-        {
-            _mainStartDoubleAnimation = doubleAnimation;
-        }
-
-        /// <summary>
         /// Sets the private Main EndPoint DoubleAnimation reference
         /// </summary>
         void SetMainEndDoubleAnimation(DoubleAnimation doubleAnimation)
         {
             _mainEndDoubleAnimation = doubleAnimation;
-        }
-
-        /// <summary>
-        /// Sets the private Track StartPoint DoubleAnimation reference
-        /// </summary>
-        void SetTrackStartDoubleAnimation(DoubleAnimation doubleAnimation)
-        {
-            _trackStartDoubleAnimation = doubleAnimation;
         }
 
         /// <summary>
@@ -342,27 +325,11 @@ namespace StorageControls
         }
 
         /// <summary>
-        /// Gets the Main StartAngle DoubleAnimation reference
-        /// </summary>
-        DoubleAnimation GetMainStartDoubleAnimation()
-        {
-            return _mainStartDoubleAnimation;
-        }
-
-        /// <summary>
         /// Gets the Main EndAngle DoubleAnimation reference
         /// </summary>
         DoubleAnimation GetMainEndDoubleAnimation()
         {
             return _mainEndDoubleAnimation;
-        }
-
-        /// <summary>
-        /// Gets the Track StartAngle DoubleAnimation reference
-        /// </summary>
-        DoubleAnimation GetTrackStartDoubleAnimation()
-        {
-            return _trackStartDoubleAnimation;
         }
 
         /// <summary>
@@ -450,9 +417,7 @@ namespace StorageControls
             if (GetContainerGrid() != null)
             {
                 SetStoryboard(GetTemplateChild(StoryboardPartName) as Storyboard);
-                SetMainStartDoubleAnimation(GetTemplateChild(MainStartAnimationPartName) as DoubleAnimation);
                 SetMainEndDoubleAnimation(GetTemplateChild(MainEndAnimationPartName) as DoubleAnimation);
-                SetTrackStartDoubleAnimation(GetTemplateChild(TrackStartAnimationPartName) as DoubleAnimation);
                 SetTrackEndDoubleAnimation(GetTemplateChild(TrackEndAnimationPartName) as DoubleAnimation);
             }
 
@@ -491,7 +456,7 @@ namespace StorageControls
 
 
 
-        #region 5. Variable updates
+        #region 5. Update functions
 
         /// <summary>
         /// Updates the normalized minimum and maximum angles.
@@ -536,20 +501,6 @@ namespace StorageControls
         private void UpdateLayout(DependencyObject d, bool useTransition)
         {
             var pRing = (PercentageRing)d;
-
-            // Determine which ring thickness is thickest
-            SetMainIsThickest(MainRingThickness, TrackRingThickness);
-
-            if (CheckMainIsThickest() == true)
-            {
-                SetLargerThickness(MainRingThickness);
-                SetSmallerThickness(TrackRingThickness);
-            }
-            else
-            {
-                SetLargerThickness(TrackRingThickness);
-                SetSmallerThickness(MainRingThickness);
-            }
 
             // Calculate the shared radius based on container size and larger thickness
             SetSharedRadius(GetContainerSize(), GetLargerThickness());
@@ -661,10 +612,15 @@ namespace StorageControls
                 pRing.SetLargerThickness(pRing.MainRingThickness);
                 pRing.SetSmallerThickness(pRing.TrackRingThickness);
             }
-            else
+            else if (pRing.MainRingThickness == pRing.TrackRingThickness)
             {
                 pRing.SetLargerThickness(pRing.MainRingThickness);
                 pRing.SetSmallerThickness(pRing.TrackRingThickness);
+            }
+            else
+            {
+                pRing.SetLargerThickness(pRing.TrackRingThickness);
+                pRing.SetSmallerThickness(pRing.MainRingThickness);
             }
 
             pRing.UpdateLayout(d, false);
@@ -713,17 +669,17 @@ namespace StorageControls
             var pRing = (PercentageRing)d;
 
             RingControl mainRing = pRing.GetMainRingControl();
-            RingControl trackRing = pRing.GetTrackRingControl();            
+            RingControl trackRing = pRing.GetTrackRingControl();
 
             if (mainRing != null && trackRing != null)
             {
+                //
                 // Grab the elements we need
                 Storyboard storyboard = pRing.GetStoryboard();
-                DoubleAnimation mainStartAnimation = pRing.GetMainStartDoubleAnimation();
-                DoubleAnimation mainEndAnimation = pRing.GetMainEndDoubleAnimation();
-                DoubleAnimation trackStartAnimation = pRing.GetTrackStartDoubleAnimation();
-                DoubleAnimation trackEndAnimation = pRing.GetTrackEndDoubleAnimation();
+                DoubleAnimation mainAnimation = pRing.GetMainEndDoubleAnimation();
+                DoubleAnimation trackAnimation = pRing.GetTrackEndDoubleAnimation();
 
+                //
                 // Set sizes for the rings as needed
                 if (pRing.CheckMainIsThickest())
                 {
@@ -733,7 +689,7 @@ namespace StorageControls
                     trackRing.Width = pRing.GetContainerSize() - (pRing.GetLargerThickness() / 2);
                     trackRing.Height = pRing.GetContainerSize() - (pRing.GetLargerThickness() / 2);
                 }
-                else
+                else if (!pRing.CheckMainIsThickest())
                 {
                     mainRing.Width = pRing.GetContainerSize() - (pRing.GetLargerThickness() / 2);
                     mainRing.Height = pRing.GetContainerSize() - (pRing.GetLargerThickness() / 2);
@@ -741,117 +697,154 @@ namespace StorageControls
                     trackRing.Width = pRing.GetContainerSize();
                     trackRing.Height = pRing.GetContainerSize();
                 }
-
-                // We gather some variables we need for setting RingControl properties
-                double previousMainStartAngle = MinAngle;
-                double nextMainStartAngle;
-
-                double previousMainEndAngle;
-                double nextMainEndAngle;
-
-                double previousTrackStartAngle;
-                double nextTrackStartAngle;
-
-                double previousTrackEndAngle;
-                double nextTrackEndAngle;
-
-                // Here we set the Previous variables
-                if (pRing.GetOldValue() <= pRing.Minimum)
-                {
-                    previousMainEndAngle        = MinAngle;
-
-                    previousTrackStartAngle     = MinAngle;
-                    previousTrackEndAngle       = MaxAngle;
-                }
-                else if (pRing.GetOldValue() > pRing.Minimum && pRing.GetOldValue() < (pRing.Minimum + 1))
-                {
-                    previousMainEndAngle        = MinAngle;
-
-                    previousTrackStartAngle     = MinAngle;
-                    previousTrackEndAngle       = MaxAngle;
-                }
-                else if (pRing.GetOldValue() == pRing.Maximum)
-                {
-                    previousMainEndAngle        = MaxAngle;
-
-                    previousTrackStartAngle     = MinAngle;
-                    previousTrackEndAngle       = MaxAngle;
-                }
                 else
                 {
-                    previousMainEndAngle        = pRing.GetOldValue();
+                    mainRing.Width = pRing.GetContainerSize();
+                    mainRing.Height = pRing.GetContainerSize();
 
-                    previousTrackStartAngle     = MinAngle + pRing.GetGapAngle();
-                    previousTrackEndAngle       = MaxAngle - pRing.GetGapAngle();
+                    trackRing.Width = pRing.GetContainerSize();
+                    trackRing.Height = pRing.GetContainerSize();
                 }
-                
 
-                // Here we set the Next variables
+                //
+                // We set the Center properties because we can
+                mainRing.Center = new Point(mainRing.Width / 2, mainRing.Height / 2);
+                trackRing.Center = new Point(trackRing.Width / 2, trackRing.Height / 2);
+
+                //
+                // Lets handle the stroke thickness first
+                //
+
+                //
+                // Value is below or at its Minimum
+                if ( pRing.Value <= pRing.Minimum )
+                {
+                    mainRing.StrokeThickness = 0;
+                    trackRing.StrokeThickness = pRing.TrackRingThickness;
+
+                    trackRing.Stroke = new SolidColorBrush( Colors.PaleGreen );
+                }
+                //
+                // Value is between it's Minimum and its Minimum + 1 (between 0 and 1)
+                else if ( pRing.Value > pRing.Minimum && pRing.Value < pRing.Minimum + 1 )
+                {
+                    mainRing.StrokeThickness = pRing.DrawThicknessTransition( pRing , pRing.Minimum , pRing.Value , pRing.Minimum + 1 , 0.0 , pRing.MainRingThickness , true );
+                    trackRing.StrokeThickness = pRing.TrackRingThickness;
+
+                    trackRing.Stroke = new SolidColorBrush( Colors.Yellow );
+                }
+                //
+                // Value is at or above its Maximum value
+                else if ( pRing.Value >= pRing.Maximum )                    
+                {
+                    trackRing.StrokeThickness = 0;
+
+                    trackRing.Stroke = new SolidColorBrush( Colors.Magenta );
+                }
+                //
+                // Any value between the Minimum + 1 and the Maximum value
+                else
+                {
+                    mainRing.StrokeThickness = pRing.MainRingThickness;
+
+                    if ( pRing.ValueAngle > ( MaxAngle + 1.0 ) - (pRing.GetGapAngle() * 2) )
+                    {
+                        trackRing.StrokeThickness = pRing.DrawThicknessTransition( pRing , ( MaxAngle + 0.1 ) - ( pRing.GetGapAngle() * 2 ) , pRing.ValueAngle , ( MaxAngle ) - ( pRing.GetGapAngle() ) , pRing.TrackRingThickness , 0.0 , true );
+                        trackRing.Stroke = new SolidColorBrush( Colors.LightBlue );
+                    }
+                    else
+                    {
+                        trackRing.StrokeThickness = pRing.TrackRingThickness;
+                        trackRing.Stroke = new SolidColorBrush( Colors.Pink );
+                    }
+                };
+
+                double animToMainStart = MinAngle;
+                double animToMainEnd;
+                double animToTrackStart;
+                double animToTrackEnd;
+
+                //
+                // Now we handle the Ring Start and End Angles
+                //
+
+                //
+                // Value is below or at its Minimum
                 if (pRing.Value <= pRing.Minimum)
                 {
-                    nextMainStartAngle          = MinAngle;
-                    nextMainEndAngle            = MinAngle+1;
+                    animToMainEnd = MinAngle;
 
-                    nextTrackStartAngle         = MinAngle;
-                    nextTrackEndAngle           = MaxAngle;
+                    animToTrackStart = MinAngle;
+                    animToTrackEnd = MaxAngle;
                 }
                 //
-                // Else if the value is between the minimum (with an offset) and the minimum + 1
-                else if (pRing.Value > (pRing.Minimum) && pRing.Value < pRing.Minimum + 1)
+                // Value is between it's Minimum and its Minimum + 1 (between 0 and 1)
+                else if (pRing.Value > pRing.Minimum && pRing.Value < pRing.Minimum + 1)
                 {
-                    nextMainStartAngle          = MinAngle;
-                    nextMainEndAngle            = pRing.ValueAngle;
+                    animToMainEnd = pRing.ValueAngle;
 
-                    nextTrackStartAngle         = MinAngle + pRing.GetGapAngle();
-                    nextTrackEndAngle           = pRing.ValueAngle - pRing.GetGapAngle();
+                    //
+                    // We need to interpolate the track start and end angles between pRing.Minimum and pRing.Minimum + 1
+                    double interpolatedStartTo    = pRing.DrawAdjustedAngle(pRing, pRing.Minimum - 0.01, pRing.Value, pRing.Minimum + 1,
+                                                                          MinAngle, MinAngle - pRing.GetGapAngle(), pRing.ValueAngle, true);
+
+                    double interpolatedEndTo      = pRing.DrawAdjustedAngle(pRing, pRing.Minimum - 0.01, pRing.Value, pRing.Minimum + 1,
+                                                                          MinAngle, MinAngle + pRing.GetGapAngle(), pRing.ValueAngle, true);
+
+                    animToTrackStart = interpolatedStartTo;
+                    animToTrackEnd = interpolatedEndTo;
                 }
                 //
-                // Else if the value is greater than or equal to the Maximum
+                // Value is at or above its Maximum value
                 else if (pRing.Value >= pRing.Maximum)
                 {
-                    nextMainStartAngle          = MinAngle;
-                    nextMainEndAngle            = pRing.ValueAngle;
+                    animToMainEnd = MaxAngle;
 
-                    nextTrackStartAngle         = MinAngle - pRing.GetGapAngle();
-                    nextTrackEndAngle           = pRing.ValueAngle ;
+                    animToTrackStart = MinAngle;
+                    animToTrackEnd = MaxAngle;
                 }
                 //
-                // For any value between Minimum and Maximum
+                // Any value between the Minimum + 1 and the Maximum value
                 else
                 {
-                    nextMainStartAngle          = MinAngle;
-                    nextMainEndAngle            = pRing.ValueAngle;
+                    animToMainEnd = pRing.ValueAngle;
 
-                    nextTrackStartAngle         = MinAngle - pRing.GetGapAngle();
-                    nextTrackEndAngle           = pRing.ValueAngle ;
+                    animToTrackStart = MinAngle - pRing.GetGapAngle();
+
+                    //
+                    // When the trackRing's EndAngle meets or exceeds its adjusted StartAngle
+                    if ( pRing.ValueAngle > ( MaxAngle + 1.0 ) - ( pRing.GetGapAngle() * 2 ) )
+                    {
+                        animToTrackEnd = (MaxAngle - 1) - pRing.GetGapAngle();
+                    }
+                    else
+                    {
+                        animToTrackEnd = pRing.ValueAngle + pRing.GetGapAngle();
+                    }
                 }
 
-                if (useTransition)
+                //
+                // Now to Animate or set the values
+                if ( useTransition )
                 {
-                    if (storyboard != null)
-                    {
-                        mainStartAnimation.From     = previousMainStartAngle;
-                        mainStartAnimation.To       = nextMainStartAngle;
+                    mainRing.StartAngle = animToMainStart;
+                    trackRing.StartAngle = animToTrackStart;
 
-                        mainEndAnimation.From       = previousMainEndAngle;
-                        mainEndAnimation.To         = nextMainEndAngle;
+                    if ( pRing.ValueAngle > ( MinAngle + pRing.GetGapAngle() ) && pRing.ValueAngle < MaxAngle - ( pRing.GetGapAngle() * 2 ) )
+                    {                    
+                        if ( storyboard != null )
+                        {
+                            mainAnimation.To = animToMainEnd;
+                            trackAnimation.To = animToTrackEnd;
 
-                        trackStartAnimation.From    = previousTrackStartAngle;
-                        trackStartAnimation.To      = nextTrackStartAngle;
-
-                        trackEndAnimation.From      = previousTrackEndAngle;
-                        trackEndAnimation.To        = nextTrackEndAngle;
-
-                        storyboard.Begin();
+                            storyboard.Begin();
+                        }
                     }
                 }
                 else
                 {
-                    mainRing.StartAngle     = nextMainStartAngle;
-                    mainRing.EndAngle       = nextMainEndAngle;
-
-                    trackRing.StartAngle    = nextTrackStartAngle;
-                    trackRing.EndAngle      = nextTrackEndAngle;
+                    mainRing.EndAngle = animToMainEnd;
+                    trackRing.EndAngle = animToTrackEnd;
                 }
             }
         }
