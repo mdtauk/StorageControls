@@ -825,27 +825,34 @@ namespace StorageControls
 
                 //
                 // Now to Animate or set the values
-                if ( useTransition )
-                {
-                    mainRing.StartAngle = animToMainStart;
-                    trackRing.StartAngle = animToTrackStart;
+                //if ( useTransition )
+                //{
+                //    mainRing.StartAngle = animToMainStart;
+                //    trackRing.StartAngle = animToTrackStart;
 
-                    if ( pRing.ValueAngle > ( MinAngle + pRing.GetGapAngle() ) && pRing.ValueAngle < MaxAngle - ( pRing.GetGapAngle() * 2 ) )
-                    {                    
-                        if ( storyboard != null )
-                        {
-                            mainAnimation.To = animToMainEnd;
-                            trackAnimation.To = animToTrackEnd;
 
-                            storyboard.Begin();
-                        }
-                    }
-                }
-                else
-                {
-                    mainRing.EndAngle = animToMainEnd;
-                    trackRing.EndAngle = animToTrackEnd;
-                }
+                //    if ( pRing.ValueAngle > ( MinAngle + pRing.GetGapAngle() ) && pRing.ValueAngle < MaxAngle - ( pRing.GetGapAngle() * 2 ) )
+                //    {                    
+                //        if ( storyboard != null )
+                //        {
+                //            mainAnimation.To = animToMainEnd;
+                //            trackAnimation.To = animToTrackEnd;
+
+                //            storyboard.Begin();
+                //        }
+                //    }
+                //}
+                //else
+                //{
+                //    mainRing.EndAngle = animToMainEnd;
+                //    trackRing.EndAngle = animToTrackEnd;
+                //}
+
+                mainRing.StartAngle = animToMainStart;
+                trackRing.StartAngle = animToTrackStart;
+
+                mainRing.EndAngle = animToMainEnd;
+                trackRing.EndAngle = animToTrackEnd;
             }
         }
 
