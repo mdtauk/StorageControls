@@ -59,7 +59,8 @@
                               VerticalAlignment="Center"
                               Background="{TemplateBinding Background}">
                             <local:RingControl x:Name="PART_MainRingControl"
-                                               EndAngle="179"
+                                               Direction="Clockwise"
+                                               EndAngle="180"
                                                StartAngle="0"
                                                Stroke="{TemplateBinding MainRingBrush}"
                                                StrokeEndLineCap="{TemplateBinding MainRingEndCap}"

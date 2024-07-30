@@ -32,11 +32,11 @@ namespace StorageControls
 
         private void OnSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs)
         {
-            Debug.Write("On Size Changed ");
+            Debug.Write( "On Size Changed " );
 
             var smaller = Math.Min(this.Width, this.Height);
 
-            _radius = (smaller - this.StrokeThickness) / 2;
+            _radius = ( smaller - this.StrokeThickness ) / 2;
 
             UpdatePath();
         }
@@ -102,7 +102,7 @@ namespace StorageControls
                         center.X + Math.Sin(StartAngle * Math.PI / 180) * _radius,
                         center.Y - Math.Cos(StartAngle * Math.PI / 180) * _radius);
 
-                // Inner Arc
+                // Arc
                 var ArcSegment = new ArcSegment();
 
                 if (Direction == SweepDirection.Counterclockwise)

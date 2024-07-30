@@ -1,15 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Automation.Peers;
-using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.ApplicationModel.Appointments.DataProvider;
 
 namespace StorageControls
 {
@@ -94,7 +85,7 @@ namespace StorageControls
                 nameof(MainRingThickness),
                 typeof(double),
                 typeof(PercentageRing),
-                new PropertyMetadata(3.0, OnRingThicknessChanged));
+                new PropertyMetadata(3.0, OnMainRingThicknessChanged));
 
         /// <summary>
         /// Identifies the TrackRingThickness dependency property.
@@ -104,7 +95,7 @@ namespace StorageControls
                 nameof(TrackRingThickness),
                 typeof(double),
                 typeof(PercentageRing),
-                new PropertyMetadata(1.0, OnRingThicknessChanged));
+                new PropertyMetadata(1.0, OnTrackRingThicknessChanged));
 
         /// <summary>
         /// Identifies the ValueAngle dependency property.
@@ -275,9 +266,9 @@ namespace StorageControls
         /// <param name="e">The event arguments containing the old and new values.</param>
         private static void OnBrushChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (e.OldValue != e.NewValue)
+            if ( e.OldValue != e.NewValue )
             {
-                BrushChanged(d, (Brush)e.NewValue);
+                BrushChanged( d , (Brush)e.NewValue );
             }
         }
 
@@ -288,22 +279,35 @@ namespace StorageControls
         /// <param name="e">The event arguments containing the old and new values.</param>
         private static void OnStrokeCapChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (e.OldValue != e.NewValue)
+            if ( e.OldValue != e.NewValue )
             {
-                StrokeCapChanged(d, (PenLineCap)e.NewValue);
+                StrokeCapChanged( d , (PenLineCap)e.NewValue );
             }
         }
 
         /// <summary>
-        /// Handles the change in Main and Track ring Thickness properties.
+        /// Handles the change in Main ring Thickness properties.
         /// </summary>
         /// <param name="d">The DependencyObject representing the control.</param>
         /// <param name="e">The event arguments containing the old and new values.</param>
-        private static void OnRingThicknessChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnMainRingThicknessChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (e.OldValue != e.NewValue)
+            if ( e.OldValue != e.NewValue )
             {
-                RingThicknessChanged(d, (double)e.NewValue);
+                RingThicknessChanged( d );
+            }
+        }
+
+        /// <summary>
+        /// Handles the change in Track ring Thickness properties.
+        /// </summary>
+        /// <param name="d">The DependencyObject representing the control.</param>
+        /// <param name="e">The event arguments containing the old and new values.</param>
+        private static void OnTrackRingThicknessChanged(DependencyObject d , DependencyPropertyChangedEventArgs e)
+        {
+            if ( e.OldValue != e.NewValue )
+            {
+                RingThicknessChanged( d );
             }
         }
 
@@ -311,11 +315,11 @@ namespace StorageControls
         protected override void OnValueChanged(double oldValue, double newValue)
         {
             SetOldValue(oldValue);
-            SetOldValueAngle(DoubleToAngle(oldValue, Minimum, Maximum, MinAngle, MaxAngle));   
+            SetOldValueAngle( DoubleToAngle( oldValue , Minimum , Maximum , MinAngle , MaxAngle ) );
 
-            base.OnValueChanged(oldValue, newValue);
+            base.OnValueChanged( oldValue , newValue );
 
-            OnValueChanged(this);
+            OnValueChanged( this );
         }
 
         #endregion
