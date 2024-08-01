@@ -22,6 +22,8 @@ namespace StorageControls
         public RingControl()
         {
             this.SizeChanged += OnSizeChanged;
+
+            RegisterPropertyChangedCallback( StrokeThicknessProperty, OnStrokeThicknessChanged);
         }
 
         #endregion
@@ -30,17 +32,31 @@ namespace StorageControls
 
         #region Properties Changing
 
+        /// <summary>
+        /// Runs when the Size changes
+        /// </summary>
         private void OnSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs)
         {
             Debug.Write( "On Size Changed " );
 
-            var smaller = Math.Min(this.Width, this.Height);
-
-            _radius = ( smaller - this.StrokeThickness ) / 2;
+            UpdateRadius();
 
             UpdatePath();
         }
 
+
+
+        /// <summary>
+        /// Runs when the StrokeThickness Changes
+        /// </summary>
+        private void OnStrokeThicknessChanged(DependencyObject sender , DependencyProperty dp)
+        {
+            Debug.Write( "On Stroke Thickness Changed " );
+
+            UpdateRadius();
+
+            UpdatePath();
+        }
         #endregion
 
 
@@ -48,15 +64,17 @@ namespace StorageControls
         #region Update events
 
         /// <summary>
-        /// Suspends path updates until EndUpdate is called;
+        /// Suspends path updates until EndUpdate is called
         /// </summary>
         public void BeginUpdate()
         {
             _isUpdating = true;
         }
 
+
+
         /// <summary>
-        /// Resumes immediate path updates every time a component property value changes. Updates the path.
+        /// Resumes immediate path updates every time a component property value changes. Updates the path
         /// </summary>
         public void EndUpdate()
         {
@@ -64,6 +82,22 @@ namespace StorageControls
             UpdatePath();
         }
 
+
+
+        /// <summary>
+        /// Updates the calculated Radius
+        /// </summary>
+        private void UpdateRadius()
+        {
+            var smaller = Math.Min(this.Width, this.Height);
+
+            _radius = ( smaller - this.StrokeThickness ) / 2;
+        }
+
+
+        /// <summary>
+        /// Updates the path
+        /// </summary>
         private void UpdatePath()
         {
            if (_isUpdating || this.ActualWidth == 0 || _radius <= 0 )

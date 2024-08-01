@@ -34,6 +34,8 @@ namespace StorageControls
             set { SetValue(StartAngleProperty, value); }
         }
 
+
+
         private static void OnStartAngleChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             var target = (RingControl)sender;
@@ -43,6 +45,8 @@ namespace StorageControls
 
             target.OnStartAngleChanged(oldStartAngle, newStartAngle);
         }
+
+
 
         private void OnStartAngleChanged(double oldStartAngle, double newStartAngle)
         {
@@ -80,6 +84,8 @@ namespace StorageControls
             set { SetValue(EndAngleProperty, value); }
         }
 
+
+
         private static void OnEndAngleChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             var target = (RingControl)sender;
@@ -89,6 +95,8 @@ namespace StorageControls
 
             target.OnEndAngleChanged(oldEndAngle, newEndAngle);
         }
+
+
 
         private void OnEndAngleChanged(double oldEndAngle, double newEndAngle)
         {
@@ -113,6 +121,8 @@ namespace StorageControls
                     SweepDirection.Clockwise,
                     OnDirectionChanged));
 
+
+
         /// <summary>
         /// Gets or sets the Direction.
         /// </summary>
@@ -125,6 +135,8 @@ namespace StorageControls
             set { SetValue(DirectionProperty, value); }
         }
 
+
+
         private static void OnDirectionChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             var target = (RingControl)sender;
@@ -134,6 +146,8 @@ namespace StorageControls
 
             target.OnDirectionChanged(oldDirection, newDirection);
         }
+
+
 
         private void OnDirectionChanged(SweepDirection oldDirection, SweepDirection newDirection)
         {
@@ -167,6 +181,8 @@ namespace StorageControls
             set { SetValue(CenterProperty, value); }
         }
 
+
+
         /// <summary>
         /// Handles changes to the Center property.
         /// </summary>
@@ -185,6 +201,8 @@ namespace StorageControls
             Point? newCenter = target.Center;
             target.OnCenterChanged(oldCenter, newCenter);
         }
+
+
 
         /// <summary>
         /// Provides derived classes an opportunity to handle changes
