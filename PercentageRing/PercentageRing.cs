@@ -821,7 +821,7 @@ namespace StorageControls
             // Value is between it's Minimum and its Minimum + 2 (between 0 and 2)
             else if ( pRing.Value > pRing.Minimum && pRing.Value < pRing.Minimum + 2 )
             {
-                mainRing.StrokeThickness = pRing.DrawThicknessTransition( pRing , pRing.Minimum , pRing.Value , pRing.Minimum + 1 , 0.0 , pRing.GetMainRingThickness() , true );
+                mainRing.StrokeThickness = pRing.DrawThicknessTransition( pRing , pRing.Minimum , pRing.Value , pRing.Minimum + 2 , 0.0 , pRing.GetMainRingThickness() , true );
                 trackRing.StrokeThickness = pRing.GetTrackRingThickness();
             }
             //

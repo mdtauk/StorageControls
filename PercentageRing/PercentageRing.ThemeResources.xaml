@@ -47,13 +47,13 @@
 
             <StaticResource x:Key="PercentRingBackgroundBrush" ResourceKey="SystemControlBackgroundBaseLowBrush" />
 
-            <StaticResource x:Key="PercentRingMainBrush" ResourceKey="SystemControlHighlightAccentBrush" />
-            <StaticResource x:Key="PercentRingMainWarningBrush" ResourceKey="SystemColorHotlightColor" />
-            <StaticResource x:Key="PercentRingMainDisabledBrush" ResourceKey="SystemControlDisabledBaseMediumLowBrush" />
+            <StaticResource x:Key="PercentRingMainBrush" ResourceKey="SystemColorHighlightColorBrush" />
+            <StaticResource x:Key="PercentRingMainWarningBrush" ResourceKey="SystemColorHotlightColorBrush" />
+            <StaticResource x:Key="PercentRingMainDisabledBrush" ResourceKey="SystemColorGrayTextBrush" />
 
-            <StaticResource x:Key="PercentRingTrackBrush" ResourceKey="SystemColorWindowTextColor" />
-            <StaticResource x:Key="PercentRingTrackWarningBrush" ResourceKey="SystemColorWindowTextColor" />
-            <StaticResource x:Key="PercentRingTrackDisabledBrush" ResourceKey="SystemControlDisabledBaseMediumLowBrush" />
+            <StaticResource x:Key="PercentRingTrackBrush" ResourceKey="SystemColorWindowTextColorBrush" />
+            <StaticResource x:Key="PercentRingTrackWarningBrush" ResourceKey="SystemColorWindowTextColorBrush" />
+            <StaticResource x:Key="PercentRingTrackDisabledBrush" ResourceKey="SystemColorGrayTextBrush" />
         </ResourceDictionary>
 
 
