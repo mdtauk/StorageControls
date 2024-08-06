@@ -11,9 +11,9 @@ namespace StorageControls
     // TemplateParts
     [TemplatePart(Name = ContainerPartName          , Type = typeof( Grid ) )]
 
-    [TemplatePart( Name = LeftColumnPartName        , Type = typeof( ColumnDefinition ) )]
+    [TemplatePart( Name = MainColumnPartName        , Type = typeof( ColumnDefinition ) )]
     [TemplatePart( Name = GapColumnPartName         , Type = typeof( ColumnDefinition ) )]
-    [TemplatePart( Name = RigthColumnPartName       , Type = typeof( ColumnDefinition ) )]
+    [TemplatePart( Name = TrackColumnPartName       , Type = typeof( ColumnDefinition ) )]
 
     [TemplatePart(Name = MainBorderPartName         , Type = typeof( Border ) )]
     [TemplatePart(Name = TrackBorderPartName        , Type = typeof( Border ) )]
@@ -29,9 +29,9 @@ namespace StorageControls
     {
         internal const string ContainerPartName         = "PART_Container";
 
-        internal const string LeftColumnPartName        = "PART_LeftColumn";
+        internal const string MainColumnPartName        = "PART_MainColumn";
         internal const string GapColumnPartName         = "PART_GapColumn";
-        internal const string RigthColumnPartName       = "PART_RightColumn";
+        internal const string TrackColumnPartName       = "PART_TrackColumn";
 
         internal const string MainBorderPartName        = "PART_MainBar";
         internal const string TrackBorderPartName       = "PART_TrackBar";

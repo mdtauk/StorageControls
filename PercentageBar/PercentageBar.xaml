@@ -21,11 +21,11 @@
                               BorderThickness="{TemplateBinding BorderThickness}"
                               FlowDirection="{TemplateBinding FlowDirection}">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition x:Name="PART_LeftColumn" />
+                                <ColumnDefinition x:Name="PART_MainColumn" />
 
                                 <ColumnDefinition x:Name="PART_GapColumn" />
 
-                                <ColumnDefinition x:Name="PART_RightColumn" />
+                                <ColumnDefinition x:Name="PART_TrackColumn" />
                             </Grid.ColumnDefinitions>
 
                             <Border x:Name="PART_MainBar" Background="{TemplateBinding MainBarBrush}" />

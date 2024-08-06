@@ -4,6 +4,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Shapes;
 using System;
 
@@ -174,6 +175,42 @@ namespace StorageControls
         #region 5. Handle Property Changes
 
         /// <summary>
+        /// Handles the Main and Track Bar Brushes Changed events
+        /// </summary>
+        /// <param name="d"></param>
+        /// <param name="newBrush"></param>
+        private static void BarBrushChanged(DependencyObject d, Brush newBrush)
+        { 
+            
+        }
+
+
+
+        /// <summary>
+        /// Handles the Main and Track Bar Height's double value Changed events
+        /// </summary>
+        /// <param name="d"></param>
+        /// <param name="newHeight"></param>
+        private static void BarHeightChanged(DependencyObject d , double newHeight)
+        {
+        
+        }
+
+
+
+        /// <summary>
+        /// Handles the PrecentWarning double value Changed event
+        /// </summary>
+        /// <param name="d"></param>
+        /// <param name="newPercentValue"></param>
+        private static void PercentWarningChanged(DependencyObject d , double newPercentValue)
+        { 
+        
+        }
+
+
+
+        /// <summary>
         /// Handles the IsEnabledChanged event
         /// </summary>
         /// <param name="sender"></param>
@@ -243,11 +280,9 @@ namespace StorageControls
 
             // 2. Update the Bar Heights
 
-            // 3. Get FlowDirection and set Main and Track Columns
+            // 3. Set the 3 Column Widths
 
-            // 4. Set the 3 Column Widths
-
-            // 5. Update the control's VisualState
+            // 4. Update the control's VisualState
         }
 
         #endregion

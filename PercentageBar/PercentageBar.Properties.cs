@@ -126,7 +126,7 @@ namespace StorageControls
         {
             if ( e.OldValue != e.NewValue )
             {
-                BarHeightChanged( d );
+                BarHeightChanged( d , (double)e.NewValue );
             }
         }
 
