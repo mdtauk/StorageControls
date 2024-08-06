@@ -818,8 +818,8 @@ namespace StorageControls
                 trackRing.StrokeThickness = pRing.GetTrackRingThickness();
             }
             //
-            // Value is between it's Minimum and its Minimum + 1 (between 0 and 1)
-            else if ( pRing.Value > pRing.Minimum && pRing.Value < pRing.Minimum + 1 )
+            // Value is between it's Minimum and its Minimum + 2 (between 0 and 2)
+            else if ( pRing.Value > pRing.Minimum && pRing.Value < pRing.Minimum + 2 )
             {
                 mainRing.StrokeThickness = pRing.DrawThicknessTransition( pRing , pRing.Minimum , pRing.Value , pRing.Minimum + 1 , 0.0 , pRing.GetMainRingThickness() , true );
                 trackRing.StrokeThickness = pRing.GetTrackRingThickness();
@@ -878,10 +878,10 @@ namespace StorageControls
 
                 //
                 // We need to interpolate the track start and end angles between pRing.Minimum and pRing.Minimum + 1
-                double interpolatedStartTo    = pRing.DrawAdjustedAngle(pRing, pRing.Minimum - 0.01, pRing.Value, pRing.Minimum + 1,
+                double interpolatedStartTo    = pRing.DrawAdjustedAngle(pRing, pRing.Minimum - 0.01, pRing.Value, pRing.Minimum + 2,
                                                                           MinAngle, MinAngle - pRing.GetGapAngle(), pRing.ValueAngle, true);
 
-                double interpolatedEndTo      = pRing.DrawAdjustedAngle(pRing, pRing.Minimum - 0.01, pRing.Value, pRing.Minimum + 1,
+                double interpolatedEndTo      = pRing.DrawAdjustedAngle(pRing, pRing.Minimum - 0.01, pRing.Value, pRing.Minimum + 2,
                                                                           MinAngle, MinAngle + pRing.GetGapAngle(), pRing.ValueAngle, true);
 
                 animToTrackStart = interpolatedStartTo;
@@ -897,7 +897,7 @@ namespace StorageControls
                 animToTrackEnd = MaxAngle;
             }
             //
-            // Any value between the Minimum + 1 and the Maximum value
+            // Any value between the Minimum and the Maximum value
             else
             {
                 animToMainEnd = pRing.ValueAngle;
