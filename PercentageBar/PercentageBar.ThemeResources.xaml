@@ -1,0 +1,42 @@
+<!--  Copyright (c) 2024 Files Community. Licensed under the MIT License. See the LICENSE.  -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="using:StorageControls">
+
+
+    <ResourceDictionary.MergedDictionaries>
+        <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+    </ResourceDictionary.MergedDictionaries>
+
+
+    <ResourceDictionary.ThemeDictionaries>
+
+        <ResourceDictionary x:Key="Default">
+            <CornerRadius x:Key="PercentageBarMainCornerRadius">3</CornerRadius>
+            <x:Double x:Key="PercentageBarMainHeight">6</x:Double>
+
+            <CornerRadius x:Key="PercentageBarTrackCornerRadius">1.5</CornerRadius>
+            <x:Double x:Key="PercentageBarTrackHeight">3</x:Double>
+        </ResourceDictionary>
+
+
+        <ResourceDictionary x:Key="HighContrast">
+            <CornerRadius x:Key="PercentageBarMainCornerRadius">3</CornerRadius>
+            <x:Double x:Key="PercentageBarMainHeight">6</x:Double>
+
+            <CornerRadius x:Key="PercentageBarTrackCornerRadius">1.5</CornerRadius>
+            <x:Double x:Key="PercentageBarTrackHeight">3</x:Double>
+        </ResourceDictionary>
+
+
+        <ResourceDictionary x:Key="Light">
+            <CornerRadius x:Key="PercentageBarMainCornerRadius">3</CornerRadius>
+            <x:Double x:Key="PercentageBarMainHeight">6</x:Double>
+
+            <CornerRadius x:Key="PercentageBarTrackCornerRadius">1.5</CornerRadius>
+            <x:Double x:Key="PercentageBarTrackHeight">3</x:Double>
+        </ResourceDictionary>
+
+    </ResourceDictionary.ThemeDictionaries>
+
+</ResourceDictionary>

@@ -55,6 +55,10 @@
             <StackPanel Grid.Column="0"
                         Orientation="Vertical"
                         Spacing="24">
+
+                <local:PercentageBar IsEnabled="{x:Bind testEnabledToggle.IsOn, Mode=TwoWay}" 
+                                     Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
+
                 <NumberBox x:Name="HeightTest"
                            Width="320"
                            Margin="16,0"

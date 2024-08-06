@@ -450,8 +450,6 @@ namespace StorageControls
         /// Runs when the OnValueChanged event fires
         /// </summary>
         /// <param name="d">The DependencyObject representing the control.</param>
-        /// <param name="newValue">The new value.</param>
-        /// <param name="oldValue">The old value.</param>
         private void OnValueChanged(DependencyObject d)
         {
             var pRing = (PercentageRing)d;
@@ -507,9 +505,9 @@ namespace StorageControls
 
         private void PercentageRing_Unloaded(object sender , RoutedEventArgs e)
         {
-            SizeChanged -= SizeChangedHandler;
+            SizeChanged -= PercentageRing_SizeChanged;
             Unloaded -= PercentageRing_Unloaded;
-            IsEnabledChanged -= PercentRing_IsEnabledChanged;
+            IsEnabledChanged -= PercentageRing_IsEnabledChanged;
         }
 
 

@@ -2,21 +2,37 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="using:StorageControls">
 
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="ms-appx:///PercentageBar/PercentageBar.ThemeResources.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+
     <Style TargetType="local:PercentageBar">
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="Background" Value="#33FFFFFF" />
+        <Setter Property="MainBarBrush" Value="Red" />
+        <Setter Property="MainBarHeight" Value="{ThemeResource PercentageBarMainHeight}" />
+        <Setter Property="TrackBarBrush" Value="Gray" />
+        <Setter Property="TrackBarHeight" Value="{ThemeResource PercentageBarTrackHeight}" />
+        <Setter Property="CornerRadius" Value="0" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:PercentageBar">
 
-                    <Grid x:Name="GridRoot" Padding="{TemplateBinding Padding}">
+                    <Grid x:Name="GridRoot"
+                          Width="{TemplateBinding Width}"
+                          Height="{TemplateBinding Height}"
+                          MinWidth="{TemplateBinding MinWidth}"
+                          MinHeight="{TemplateBinding MinHeight}"
+                          MaxWidth="{TemplateBinding MaxWidth}"
+                          MaxHeight="{TemplateBinding MaxHeight}"
+                          Padding="{TemplateBinding Padding}"
+                          Background="{TemplateBinding Background}">
 
                         <Grid x:Name="PART_Container"
-                              Width="{TemplateBinding Width}"
-                              Height="{TemplateBinding Height}"
-                              MinWidth="{TemplateBinding MinWidth}"
-                              MinHeight="{TemplateBinding MinHeight}"
-                              MaxWidth="{TemplateBinding MaxWidth}"
-                              MaxHeight="{TemplateBinding MaxHeight}"
-                              Background="{TemplateBinding Background}"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"
                               BorderBrush="{TemplateBinding BorderBrush}"
                               BorderThickness="{TemplateBinding BorderThickness}"
                               FlowDirection="{TemplateBinding FlowDirection}">
@@ -28,9 +44,24 @@
                                 <ColumnDefinition x:Name="PART_TrackColumn" />
                             </Grid.ColumnDefinitions>
 
-                            <Border x:Name="PART_MainBar" Background="{TemplateBinding MainBarBrush}" />
+                            <Border x:Name="PART_MainBar"
+                                    Grid.Column="0"
+                                    Height="{TemplateBinding MainBarHeight}"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Background="{TemplateBinding MainBarBrush}" />
 
-                            <Border x:Name="PART_TrackBar" Background="{TemplateBinding TrackBarBrush}" />
+                            <Border x:Name="PART_TrackBar"
+                                    Grid.Column="2"
+                                    Height="{TemplateBinding TrackBarHeight}"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Background="{TemplateBinding TrackBarBrush}" />
+
+                            <TextBlock Grid.ColumnSpan="3"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Text="{TemplateBinding Value}" />
 
                         </Grid>
 

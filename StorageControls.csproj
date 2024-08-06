@@ -37,5 +37,14 @@
   <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
   </PropertyGroup>
+  <ItemGroup>
+    <CustomAdditionalCompileInputs Remove="PercentageBar\PercentageBar.ThemeResources.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="PercentageBar\PercentageBar.ThemeResources.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Remove="PercentageBar\PercentageBar.ThemeResources.xaml" />
+  </ItemGroup>
       
 </Project>

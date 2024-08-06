@@ -71,7 +71,7 @@ namespace StorageControls
 
 
 
-        #region Main and Track Bar Height (double)
+        #region Main Bar Height (double)
 
         /// <summary>
         /// Identifies the MainBarHeight dependency property.
@@ -81,7 +81,7 @@ namespace StorageControls
                 nameof(MainBarHeight),
                 typeof(double),
                 typeof(PercentageBar),
-                new PropertyMetadata(4.0, OnBarHeightChanged));
+                new PropertyMetadata(4.0, OnMainBarHeightChanged));
 
 
         /// <summary>
@@ -93,7 +93,25 @@ namespace StorageControls
             set { SetValue( MainBarHeightProperty , value ); }
         }
 
-        ///
+
+        /// <summary>
+        /// Handles the change in MainBar Height property.
+        /// </summary>
+        /// <param name="d">The DependencyObject representing the control.</param>
+        /// <param name="e">The event arguments containing the old and new values.</param>
+        private static void OnMainBarHeightChanged(DependencyObject d , DependencyPropertyChangedEventArgs e)
+        {
+            if ( e.OldValue != e.NewValue )
+            {
+                MainBarHeightChanged( d , (double)e.NewValue );
+            }
+        }
+
+        #endregion
+
+
+
+        #region Track Bar Height (double)
 
         /// <summary>
         /// Identifies the TrackBarHeight dependency property.
@@ -103,7 +121,7 @@ namespace StorageControls
                 nameof(TrackBarHeight),
                 typeof(double),
                 typeof(PercentageBar),
-                new PropertyMetadata(2.0, OnBarHeightChanged));
+                new PropertyMetadata(2.0, OnTrackBarHeightChanged));
 
 
         /// <summary>
@@ -118,15 +136,15 @@ namespace StorageControls
         ///
 
         /// <summary>
-        /// Handles the change in MainBar and TrackBar Height properties.
+        /// Handles the change in TrackBar Height property.
         /// </summary>
         /// <param name="d">The DependencyObject representing the control.</param>
         /// <param name="e">The event arguments containing the old and new values.</param>
-        private static void OnBarHeightChanged(DependencyObject d , DependencyPropertyChangedEventArgs e)
+        private static void OnTrackBarHeightChanged(DependencyObject d , DependencyPropertyChangedEventArgs e)
         {
             if ( e.OldValue != e.NewValue )
             {
-                BarHeightChanged( d , (double)e.NewValue );
+                TrackBarHeightChanged( d , (double)e.NewValue );
             }
         }
 
@@ -200,7 +218,7 @@ namespace StorageControls
 
 
 
-        #region Inherited Property Change Events
+        #region Derived RangeBase Events
 
         /// <inheritdoc/>
         protected override void OnValueChanged(double oldValue , double newValue)
@@ -210,6 +228,24 @@ namespace StorageControls
             base.OnValueChanged( oldValue , newValue );
 
             OnValueChanged( this );
+        }
+
+
+
+        /// <inheritdoc/>
+        protected override void OnMaximumChanged(double oldValue , double newValue)
+        {
+            base.OnMaximumChanged( oldValue , newValue );
+            UpdateValue( this , oldValue , newValue );
+        }
+
+
+
+        /// <inheritdoc/>
+        protected override void OnMinimumChanged(double oldValue , double newValue)
+        {
+            base.OnMinimumChanged( oldValue , newValue );
+            UpdateValue( this , oldValue , newValue );
         }
 
         #endregion
