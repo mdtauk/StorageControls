@@ -1,40 +1,39 @@
-﻿using Microsoft.UI.Xaml;
+﻿// Copyright (c) 2024 Files Community
+// Licensed under the MIT License. See the LICENSE.
+
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Media.Animation;
-using Microsoft.UI.Xaml.Shapes;
 using System;
 
 namespace StorageControls
 {
-    [TemplatePart(Name = ContainerPartName, Type = typeof(Grid))]
-    [TemplatePart(Name = MainRingControlPartName, Type = typeof(RingControl))]
-    [TemplatePart(Name = TrackRingControlPartName, Type = typeof(RingControl))]
+    // TemplateParts
+    [TemplatePart(Name = ContainerPartName          , Type = typeof(Grid))]
+    [TemplatePart(Name = MainRingShapePartName      , Type = typeof(RingShape))]
+    [TemplatePart(Name = TrackRingShapePartName     , Type = typeof(RingShape))]
 
-    [TemplatePart(Name = StoryboardPartName, Type = typeof(Storyboard))]
+    // VisualStates
+    [TemplateVisualState( Name = SafeStateName      , GroupName = ControlStateGroupName )]
+    [TemplateVisualState( Name = WarningStateName   , GroupName = ControlStateGroupName )]
+    [TemplateVisualState( Name = DisabledStateName  , GroupName = ControlStateGroupName )]
 
-    [TemplatePart(Name = MainStartAnimationPartName, Type = typeof(DoubleAnimation))]
-    [TemplatePart(Name = MainEndAnimationPartName, Type = typeof(DoubleAnimation))]
 
-    [TemplatePart(Name = TrackStartAnimationPartName, Type = typeof(DoubleAnimation))]
-    [TemplatePart(Name = TrackEndAnimationPartName, Type = typeof(DoubleAnimation))]
 
     public partial class PercentageRing : RangeBase
     {
-        internal const string ContainerPartName = "PART_Container";
-        internal const string MainRingControlPartName = "PART_MainRingControl";
-        internal const string TrackRingControlPartName = "PART_TrackRingControl";
+        internal const string ContainerPartName         = "PART_Container";
+        internal const string MainRingShapePartName     = "PART_MainRingShape";
+        internal const string TrackRingShapePartName    = "PART_TrackRingShape";
 
-        internal const string StoryboardPartName = "PART_Storyboard";
+        internal const string ControlStateGroupName     = "ControlStates";
 
-        internal const string MainStartAnimationPartName = "PART_MainStartDoubleAnimation";
-        internal const string MainEndAnimationPartName = "PART_MainEndDoubleAnimation";
+        internal const string SafeStateName             = "Safe";
+        internal const string WarningStateName          = "Warning";
+        internal const string DisabledStateName         = "Disabled";
 
-        internal const string TrackStartAnimationPartName = "PART_TrackStartDoubleAnimation";
-        internal const string TrackEndAnimationPartName = "PART_TrackEndDoubleAnimation";
-
-        internal const double Degrees2Radians = Math.PI / 180;
-        internal const double MaxAngle = 360;
-        internal const double MinAngle = 0;
+        internal const double Degrees2Radians   = Math.PI / 180;
+        internal const double MaxAngle          = 360;
+        internal const double MinAngle          = 0;
     }
 }

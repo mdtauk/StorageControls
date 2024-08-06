@@ -1,26 +1,31 @@
+<!--  Copyright (c) 2024 Files Community. Licensed under the MIT License. See the LICENSE.  -->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="using:StorageControls">
 
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="ms-appx:///PercentageRing/PercentageRing.ThemeResources.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+
     <Style BasedOn="{StaticResource DefaultPercentageRingStyle}" TargetType="local:PercentageRing" />
 
     <Style x:Key="DefaultPercentageRingStyle" TargetType="local:PercentageRing">
-        <Setter Property="Value" Value="25" />
         <Setter Property="Minimum" Value="0" />
         <Setter Property="Maximum" Value="100" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="Height" Value="16" />
         <Setter Property="Width" Value="16" />
-        <Setter Property="MainRingBrush" Value="{ThemeResource AccentFillColorDefaultBrush}" />
-        <Setter Property="TrackRingBrush" Value="{ThemeResource ControlStrongStrokeColorDefaultBrush}" />
-        <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
-        <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="MainRingThickness" Value="3" />
-        <Setter Property="TrackRingThickness" Value="1" />
-        <Setter Property="MainRingStartCap" Value="Round" />
-        <Setter Property="MainRingEndCap" Value="Round" />
-        <Setter Property="TrackRingStartCap" Value="Round" />
-        <Setter Property="TrackRingEndCap" Value="Round" />
+        <Setter Property="MainRingBrush" Value="{ThemeResource PercentRingMainBrush}" />
+        <Setter Property="TrackRingBrush" Value="{ThemeResource PercentRingTrackBrush}" />
+        <Setter Property="Background" Value="{ThemeResource PercentRingBackgroundBrush}" />
+        <Setter Property="MainRingThickness" Value="{ThemeResource PercentRingMainRingThickness}" />
+        <Setter Property="TrackRingThickness" Value="{ThemeResource PercentRingTrackRingThickness}" />
+        <Setter Property="MainRingStartCap" Value="{ThemeResource PercentRingMainStartCap}" />
+        <Setter Property="MainRingEndCap" Value="{ThemeResource PercentRingMainEndCap}" />
+        <Setter Property="TrackRingStartCap" Value="{ThemeResource PercentRingTrackStartCap}" />
+        <Setter Property="TrackRingEndCap" Value="{ThemeResource PercentRingTrackEndCap}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:PercentageRing">
@@ -29,54 +34,60 @@
                           Padding="{TemplateBinding Padding}"
                           Background="Transparent"
                           BorderThickness="{TemplateBinding BorderThickness}">
-                        <Grid.Resources>
-                            <Storyboard x:Name="PART_Storyboard"
-                                        FillBehavior="HoldEnd"
-                                        Duration="0:0:0.333">
-
-                                <DoubleAnimation x:Name="PART_MainEndDoubleAnimation"
-                                                 EnableDependentAnimation="True"
-                                                 Storyboard.TargetName="PART_MainRingControl"
-                                                 Storyboard.TargetProperty="(RingControl.EndAngle)">
-                                    <DoubleAnimation.EasingFunction>
-                                        <CubicEase />
-                                    </DoubleAnimation.EasingFunction>
-                                </DoubleAnimation>
-
-                                <DoubleAnimation x:Name="PART_TrackEndDoubleAnimation"
-                                                 EnableDependentAnimation="True"
-                                                 Storyboard.TargetName="PART_TrackRingControl"
-                                                 Storyboard.TargetProperty="(RingControl.EndAngle)">
-                                    <DoubleAnimation.EasingFunction>
-                                        <CubicEase />
-                                    </DoubleAnimation.EasingFunction>
-                                </DoubleAnimation>
-                            </Storyboard>
-                        </Grid.Resources>
-
                         <Grid x:Name="PART_Container"
                               HorizontalAlignment="Center"
                               VerticalAlignment="Center"
                               Background="{TemplateBinding Background}">
-                            <local:RingControl x:Name="PART_MainRingControl"
-                                               Direction="Clockwise"
-                                               EndAngle="180"
-                                               StartAngle="0"
-                                               Stroke="{TemplateBinding MainRingBrush}"
-                                               StrokeEndLineCap="{TemplateBinding MainRingEndCap}"
-                                               StrokeLineJoin="Round"
-                                               StrokeStartLineCap="{TemplateBinding MainRingStartCap}" />
+                            <local:RingShape x:Name="PART_MainRingShape"
+                                             Direction="Clockwise"
+                                             EndAngle="180"
+                                             StartAngle="0"
+                                             Stroke="{TemplateBinding MainRingBrush}"
+                                             StrokeEndLineCap="{TemplateBinding MainRingEndCap}"
+                                             StrokeLineJoin="Round"
+                                             StrokeStartLineCap="{TemplateBinding MainRingStartCap}" />
 
-                            <local:RingControl x:Name="PART_TrackRingControl"
-                                               Direction="Counterclockwise"
-                                               EndAngle="30"
-                                               StartAngle="345"
-                                               Stroke="{TemplateBinding TrackRingBrush}"
-                                               StrokeEndLineCap="{TemplateBinding TrackRingEndCap}"
-                                               StrokeLineJoin="Round"
-                                               StrokeStartLineCap="{TemplateBinding TrackRingStartCap}" />
+                            <local:RingShape x:Name="PART_TrackRingShape"
+                                             Direction="Counterclockwise"
+                                             EndAngle="30"
+                                             StartAngle="345"
+                                             Stroke="{TemplateBinding TrackRingBrush}"
+                                             StrokeEndLineCap="{TemplateBinding TrackRingEndCap}"
+                                             StrokeLineJoin="Round"
+                                             StrokeStartLineCap="{TemplateBinding TrackRingStartCap}" />
 
                         </Grid>
+
+
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="ControlStates">
+
+                                <VisualState x:Name="Safe" />
+
+                                <VisualState x:Name="Warning">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_MainRingShape" Storyboard.TargetProperty="Stroke">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PercentRingMainWarningBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_TrackRingShape" Storyboard.TargetProperty="Stroke">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PercentRingTrackDisabledBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_MainRingShape" Storyboard.TargetProperty="Stroke">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PercentRingMainDisabledBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_TrackRingShape" Storyboard.TargetProperty="Stroke">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PercentRingTrackDisabledBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

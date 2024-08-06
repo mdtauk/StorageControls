@@ -1,10 +1,10 @@
-﻿using Microsoft.UI;
+﻿// Copyright (c) 2024 Files Community
+// Licensed under the MIT License. See the LICENSE.
+
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Animation;
-using Microsoft.UI.Xaml.Shapes;
 using System;
 using Windows.Foundation;
 
@@ -32,12 +32,8 @@ namespace StorageControls
         double              _smallerThickness;              // The smaller of the two ring thicknesses
 
         Grid                _containerGrid;                 // Reference to the container Grid
-        RingControl         _mainRingControl;               // Reference to the Main RingControl
-        RingControl         _trackRingControl;              // Reference to the Track RingControl
-
-        Storyboard          _storyboard;                    // Stores a reference to the control Storyboard
-        DoubleAnimation     _mainEndDoubleAnimation;        // Stores a reference to the Main Ring EndAngle Animation
-        DoubleAnimation     _trackEndDoubleAnimation;       // Stores a reference to the Track EndAngle Ring Animation
+        RingShape         _mainRingControl;               // Reference to the Main RingControl
+        RingShape         _trackRingControl;              // Reference to the Track RingControl
 
         RectangleGeometry   _clipRect;                      // Clipping RectangleGeometry for the canvas
 
@@ -176,7 +172,7 @@ namespace StorageControls
         /// <summary>
         /// Sets the private Main RingControl reference
         /// </summary>
-        void SetMainRingControl(RingControl ringControl)
+        void SetMainRingControl(RingShape ringControl)
         {
             _mainRingControl = ringControl;
         }
@@ -184,33 +180,9 @@ namespace StorageControls
         /// <summary>
         /// Sets the private Track RingControl reference
         /// </summary>
-        void SetTrackRingControl(RingControl ringControl)
+        void SetTrackRingControl(RingShape ringControl)
         {
             _trackRingControl = ringControl;
-        }
-
-        /// <summary>
-        /// Sets the private Storyboard reference
-        /// </summary>
-        void SetStoryboard(Storyboard storyboard)
-        {
-            _storyboard = storyboard;
-        }
-
-        /// <summary>
-        /// Sets the private Main EndPoint DoubleAnimation reference
-        /// </summary>
-        void SetMainEndDoubleAnimation(DoubleAnimation doubleAnimation)
-        {
-            _mainEndDoubleAnimation = doubleAnimation;
-        }
-
-        /// <summary>
-        /// Sets the private Track EndPoint DoubleAnimation reference
-        /// </summary>
-        void SetTrackEndDoubleAnimation(DoubleAnimation doubleAnimation)
-        {
-            _trackEndDoubleAnimation = doubleAnimation;
         }
 
         /// <summary>
@@ -342,7 +314,7 @@ namespace StorageControls
         /// <summary>
         /// Gets the Main RingControl reference
         /// </summary>
-        RingControl GetMainRingControl()
+        RingShape GetMainRingControl()
         {
             return _mainRingControl;
         }
@@ -350,33 +322,9 @@ namespace StorageControls
         /// <summary>
         /// Gets the Track RingControl reference
         /// </summary>
-        RingControl GetTrackRingControl()
+        RingShape GetTrackRingControl()
         {
             return _trackRingControl;
-        }
-
-        /// <summary>
-        /// Gets the Storyboard reference
-        /// </summary>
-        Storyboard GetStoryboard()
-        {
-            return _storyboard;
-        }
-
-        /// <summary>
-        /// Gets the Main EndAngle DoubleAnimation reference
-        /// </summary>
-        DoubleAnimation GetMainEndDoubleAnimation()
-        {
-            return _mainEndDoubleAnimation;
-        }
-
-        /// <summary>
-        /// Gets the Track EndAngle DoubleAnimation reference
-        /// </summary>
-        DoubleAnimation GetTrackEndDoubleAnimation()
-        {
-            return _trackEndDoubleAnimation;
         }
 
         /// <summary>
@@ -423,11 +371,16 @@ namespace StorageControls
         public PercentageRing()
         {
             SizeChanged -= SizeChangedHandler;
+            Unloaded -= PercentageRing_Unloaded;
+            IsEnabledChanged -= PercentRing_IsEnabledChanged;
 
             DefaultStyleKey = typeof(PercentageRing);
 
             SizeChanged += SizeChangedHandler;
+            Unloaded += PercentageRing_Unloaded;
+            IsEnabledChanged += PercentRing_IsEnabledChanged;
         }
+
 
 
         /// <summary>
@@ -450,21 +403,14 @@ namespace StorageControls
             // Retrieve references to visual elements
             SetContainerGrid(GetTemplateChild(ContainerPartName) as Grid);
 
-            SetMainRingControl(GetTemplateChild(MainRingControlPartName) as RingControl);
-            SetTrackRingControl(GetTemplateChild(TrackRingControlPartName) as RingControl);
-
-            if (GetContainerGrid() != null)
-            {
-                SetStoryboard(GetTemplateChild(StoryboardPartName) as Storyboard);
-                SetMainEndDoubleAnimation(GetTemplateChild(MainEndAnimationPartName) as DoubleAnimation);
-                SetTrackEndDoubleAnimation(GetTemplateChild(TrackEndAnimationPartName) as DoubleAnimation);
-            }
+            SetMainRingControl(GetTemplateChild(MainRingShapePartName) as RingShape);
+            SetTrackRingControl(GetTemplateChild(TrackRingShapePartName) as RingShape);
 
             // Update protected dependency properties
             ValueAngle = DoubleToAngle(Value, Minimum, Maximum, MinAngle, MaxAngle);
             Percent = GetPercentageString(Value, Minimum, Maximum);
 
-            this.UpdateLayout(this, false);
+            this.UpdateLayout( this );
         }
 
         #endregion
@@ -483,7 +429,21 @@ namespace StorageControls
         {
             var pRing = sender as PercentageRing;
 
-            pRing.UpdateLayout( pRing , false );
+            pRing.UpdateLayout( pRing );
+        }
+        
+        
+        
+        /// <summary>
+         /// Runs when the PrecentWarning property changes
+         /// </summary>
+         /// <param name="d">The DependencyObject representing the control.</param>
+         /// <param name="newValue">The new value.</param>
+        private static void PercentWarningChanged(DependencyObject d, double newPercentage)
+        {
+            var pRing = (PercentageRing)d;
+
+            pRing.UpdateLayout( d );
         }
 
 
@@ -504,7 +464,7 @@ namespace StorageControls
             // Updates the Percent value as a formatted string
             pRing.Percent = pRing.GetPercentageString( pRing.Value , pRing.Minimum , pRing.Maximum );
 
-            pRing.UpdateLayout( pRing , true );
+            pRing.UpdateLayout( d );
         }
 
 
@@ -514,7 +474,7 @@ namespace StorageControls
         {
             base.OnMinimumChanged( oldMinimum , newMinimum );
 
-            UpdateLayout( this , false );
+            UpdateLayout( this );
         }
 
 
@@ -524,7 +484,34 @@ namespace StorageControls
         {
             base.OnMaximumChanged( oldMaximum , newMaximum );
 
-            UpdateLayout( this , false );
+            UpdateLayout( this );
+        }
+
+
+
+        /// <inheritdoc/>
+        private void PercentRing_IsEnabledChanged(object sender , DependencyPropertyChangedEventArgs e)
+        {
+            OnIsEnabledChanged();
+        }
+
+
+
+        /// <summary>
+        /// Invoked when the PercentageRing's IsEnabled property changes
+        /// </summary>
+        private void OnIsEnabledChanged()
+        {
+            UpdateLayout( this );
+        }
+
+
+
+        private void PercentageRing_Unloaded(object sender , RoutedEventArgs e)
+        {
+            SizeChanged -= SizeChangedHandler;
+            Unloaded -= PercentageRing_Unloaded;
+            IsEnabledChanged -= PercentRing_IsEnabledChanged;
         }
 
 
@@ -538,13 +525,13 @@ namespace StorageControls
         {
             var pRing = (PercentageRing)d;
 
-            pRing.UpdateLayout( pRing , false );
+            pRing.UpdateLayout( d );
         }
 
 
 
         /// <summary>
-        /// Runs when either ring Brush property changes
+        /// Runs when the Main Ring Brush property changes
         /// </summary>
         /// <param name="d">The DependencyObject representing the control.</param>
         /// <param name="newValue">The new value.</param>
@@ -552,7 +539,7 @@ namespace StorageControls
         {
             var pRing = (PercentageRing)d;
 
-            pRing.UpdateLayout( d , false );
+            pRing.UpdateLayout( d );
         }
 
 
@@ -565,7 +552,7 @@ namespace StorageControls
         {
             var pRing = (PercentageRing)d;
 
-            pRing.UpdateLayout( d , false );
+            pRing.UpdateLayout( d );
         }
 
         #endregion
@@ -579,16 +566,18 @@ namespace StorageControls
         /// </summary>
         /// <param name="d">The DependencyObject representing the control.</param>
         /// <param name="useTransition">Indicates whether to use a transition effect.</param>
-        private void UpdateLayout(DependencyObject d , bool useTransition)
+        private void UpdateLayout(DependencyObject d)
         {
             var pRing = (PercentageRing)d;
 
             // 1. Update the size
             UpdateContainerSize( d );
 
+
             // 2. Update the Thicknesses
             UpdateStrokeThicknesses( pRing , pRing.MainRingThickness , true );
             UpdateStrokeThicknesses( pRing , pRing.TrackRingThickness , false );
+
 
             // 3. Calculate the shared radius based on container size and larger thickness
             if ( pRing.GetThicknessCheck() == ThicknessCheck.Equal )
@@ -600,12 +589,34 @@ namespace StorageControls
                 pRing.SetSharedRadius( GetContainerSize() , GetLargerThickness() );
             }
 
+
             // 4. Calculate the gap angle
             double angle = pRing.GapThicknessToAngle(pRing.GetSharedRadius(), ( pRing.GetLargerThickness() * 0.75 ) );
             SetGapAngle( angle );
 
-            // 5. Draw all rings with the specified transition
-            DrawAllRings( pRing , useTransition );
+
+            // 5. Update the control's VisualState
+            if ( pRing.IsEnabled == false )
+            {
+                VisualStateManager.GoToState( this , DisabledStateName , true );
+            }
+            else
+            { 
+                double currentPercentage = pRing.DoubleToPercentage(pRing.Value, pRing.Minimum, pRing.Maximum);
+
+                if ( currentPercentage >= pRing.PercentWarning )
+                {
+                    VisualStateManager.GoToState( this , WarningStateName , true );
+                }
+                else
+                {
+                    VisualStateManager.GoToState( this , SafeStateName , true );
+                }
+            }
+
+
+            // 6. Draw all rings with the specified transition
+            DrawAllRings( pRing );
         }
 
 
@@ -736,63 +747,24 @@ namespace StorageControls
         /// </summary>
         /// <param name="d">The DependencyObject representing the control.</param>
         /// <param name="useTransition">Indicates whether to use a transition effect.</param>
-        private static void DrawAllRings(DependencyObject d, bool useTransition)
+        private static void DrawAllRings(DependencyObject d)
         {
             var pRing = (PercentageRing)d;
 
-            RingControl mainRing = pRing.GetMainRingControl();
-            RingControl trackRing = pRing.GetTrackRingControl();
+            RingShape mainRing = pRing.GetMainRingControl();
+            RingShape trackRing = pRing.GetTrackRingControl();
 
             if (mainRing != null && trackRing != null)
             {
-                //
-                // Grab the elements we need
-                Storyboard storyboard = pRing.GetStoryboard();
-                DoubleAnimation mainAnimation = pRing.GetMainEndDoubleAnimation();
-                DoubleAnimation trackAnimation = pRing.GetTrackEndDoubleAnimation();
-                                
                 DrawRingStrokes( pRing , mainRing , trackRing );
                 DrawRingAngles(pRing , mainRing , trackRing );
                 DrawRingSizes( pRing , mainRing , trackRing );
-
-                /*
-                //
-                // Now to Animate or set the values
-                //if ( useTransition )
-                //{
-                //    mainRing.StartAngle = animToMainStart;
-                //    trackRing.StartAngle = animToTrackStart;
-
-
-                //    if ( pRing.ValueAngle > ( MinAngle + pRing.GetGapAngle() ) && pRing.ValueAngle < MaxAngle - ( pRing.GetGapAngle() * 2 ) )
-                //    {                    
-                //        if ( storyboard != null )
-                //        {
-                //            mainAnimation.To = animToMainEnd;
-                //            trackAnimation.To = animToTrackEnd;
-
-                //            storyboard.Begin();
-                //        }
-                //    }
-                //}
-                //else
-                //{
-                //    mainRing.EndAngle = animToMainEnd;
-                //    trackRing.EndAngle = animToTrackEnd;
-                //}
-
-                //mainRing.StartAngle = animToMainStart;
-                //trackRing.StartAngle = animToTrackStart;
-
-                //mainRing.EndAngle = animToMainEnd;
-                //trackRing.EndAngle = animToTrackEnd;
-                */
             }
         }
 
 
 
-        private static void DrawRingSizes(DependencyObject d , RingControl mainRing , RingControl trackRing)
+        private static void DrawRingSizes(DependencyObject d , RingShape mainRing , RingShape trackRing)
         {
             var pRing = (PercentageRing)d;
 
@@ -834,7 +806,7 @@ namespace StorageControls
 
 
 
-        private static void DrawRingStrokes(DependencyObject d , RingControl mainRing , RingControl trackRing)
+        private static void DrawRingStrokes(DependencyObject d , RingShape mainRing , RingShape trackRing)
         {
             var pRing = (PercentageRing)d;
 
@@ -880,7 +852,7 @@ namespace StorageControls
 
 
 
-        private static void DrawRingAngles(DependencyObject d , RingControl mainRing , RingControl trackRing)
+        private static void DrawRingAngles(DependencyObject d , RingShape mainRing , RingShape trackRing)
         {
             var pRing = (PercentageRing)d;
 

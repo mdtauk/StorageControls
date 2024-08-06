@@ -1,4 +1,7 @@
-﻿using Microsoft.UI.Xaml;
+﻿// Copyright (c) 2024 Files Community
+// Licensed under the MIT License. See the LICENSE.
+
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Shapes;
 using System.Diagnostics;
@@ -6,7 +9,7 @@ using Windows.Foundation;
 
 namespace StorageControls
 {
-    public sealed partial class RingControl : Path
+    public sealed partial class RingShape : Path
     {
         #region StartAngle
 
@@ -17,7 +20,7 @@ namespace StorageControls
             DependencyProperty.Register(
                 "StartAngle",
                 typeof(double),
-                typeof(RingControl),
+                typeof(RingShape),
                 new PropertyMetadata(
                     0d,
                     OnStartAngleChanged));
@@ -38,7 +41,7 @@ namespace StorageControls
 
         private static void OnStartAngleChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            var target = (RingControl)sender;
+            var target = (RingShape)sender;
 
             var oldStartAngle = (double)e.OldValue;
             var newStartAngle = (double)e.NewValue;
@@ -67,7 +70,7 @@ namespace StorageControls
             DependencyProperty.Register(
                 "EndAngle",
                 typeof(double),
-                typeof(RingControl),
+                typeof(RingShape),
                 new PropertyMetadata(
                     0d,
                     OnEndAngleChanged));
@@ -88,7 +91,7 @@ namespace StorageControls
 
         private static void OnEndAngleChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            var target = (RingControl)sender;
+            var target = (RingShape)sender;
 
             var oldEndAngle = (double)e.OldValue;
             var newEndAngle = (double)e.NewValue;
@@ -116,7 +119,7 @@ namespace StorageControls
             DependencyProperty.Register(
                 "Direction",
                 typeof(SweepDirection),
-                typeof(RingControl),
+                typeof(RingShape),
                 new PropertyMetadata(
                     SweepDirection.Clockwise,
                     OnDirectionChanged));
@@ -139,7 +142,7 @@ namespace StorageControls
 
         private static void OnDirectionChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            var target = (RingControl)sender;
+            var target = (RingShape)sender;
 
             var oldDirection = (SweepDirection)e.OldValue;
             var newDirection = (SweepDirection)e.NewValue;
@@ -167,7 +170,7 @@ namespace StorageControls
             DependencyProperty.Register(
                 "Center",
                 typeof(Point?),
-                typeof(RingControl),
+                typeof(RingShape),
                 new PropertyMetadata(null, OnCenterChanged));
 
         /// <summary>
@@ -196,7 +199,7 @@ namespace StorageControls
         /// </param>
         private static void OnCenterChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var target = (RingControl)d;
+            var target = (RingShape)d;
             Point? oldCenter = (Point?)e.OldValue;
             Point? newCenter = target.Center;
             target.OnCenterChanged(oldCenter, newCenter);

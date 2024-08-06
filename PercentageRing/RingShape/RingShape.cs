@@ -1,5 +1,7 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Data;
+﻿// Copyright (c) 2024 Files Community
+// Licensed under the MIT License. See the LICENSE.
+
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Shapes;
 using System;
@@ -8,7 +10,7 @@ using Windows.Foundation;
 
 namespace StorageControls
 {
-    public sealed partial class RingControl : Path
+    public sealed partial class RingShape : Path
     {
         private bool        _isUpdating;
         private double      _radius;
@@ -17,9 +19,9 @@ namespace StorageControls
         #region Initialisation
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RingControl" /> class.
+        /// Initializes a new instance of the <see cref="RingShape" /> class.
         /// </summary>
-        public RingControl()
+        public RingShape()
         {
             this.SizeChanged += OnSizeChanged;
 

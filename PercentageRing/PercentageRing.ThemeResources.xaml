@@ -1,0 +1,85 @@
+<!--  Copyright (c) 2024 Files Community. Licensed under the MIT License. See the LICENSE.  -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="using:StorageControls">
+
+
+    <ResourceDictionary.MergedDictionaries>
+        <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+    </ResourceDictionary.MergedDictionaries>
+
+
+    <ResourceDictionary.ThemeDictionaries>
+
+        <ResourceDictionary x:Key="Default">
+            <x:Double x:Key="PercentRingMainRingThickness">3</x:Double>
+            <x:Double x:Key="PercentRingTrackRingThickness">1</x:Double>
+
+            <Thickness x:Key="PercentRingPadding">0</Thickness>
+
+            <PenLineCap x:Key="PercentRingMainStartCap">Round</PenLineCap>
+            <PenLineCap x:Key="PercentRingMainEndCap">Round</PenLineCap>
+            <PenLineCap x:Key="PercentRingTrackStartCap">Round</PenLineCap>
+            <PenLineCap x:Key="PercentRingTrackEndCap">Round</PenLineCap>
+
+            <StaticResource x:Key="PercentRingBackgroundBrush" ResourceKey="ControlFillColorTransparentBrush" />
+
+            <StaticResource x:Key="PercentRingMainBrush" ResourceKey="AccentFillColorDefaultBrush" />
+            <StaticResource x:Key="PercentRingMainWarningBrush" ResourceKey="SystemFillColorCautionBrush" />
+            <StaticResource x:Key="PercentRingMainDisabledBrush" ResourceKey="AccentFillColorDisabledBrush" />
+
+            <StaticResource x:Key="PercentRingTrackBrush" ResourceKey="ControlStrongStrokeColorDefaultBrush" />
+            <StaticResource x:Key="PercentRingTrackWarningBrush" ResourceKey="ControlStrongStrokeColorDefaultBrush" />
+            <StaticResource x:Key="PercentRingTrackDisabledBrush" ResourceKey="ControlStrongStrokeColorDisabledBrush" />
+        </ResourceDictionary>
+
+
+        <ResourceDictionary x:Key="HighContrast">
+            <x:Double x:Key="PercentRingMainRingThickness">4</x:Double>
+            <x:Double x:Key="PercentRingTrackRingThickness">2</x:Double>
+
+            <Thickness x:Key="PercentRingPadding">0</Thickness>
+
+            <PenLineCap x:Key="PercentRingMainStartCap">Round</PenLineCap>
+            <PenLineCap x:Key="PercentRingMainEndCap">Round</PenLineCap>
+            <PenLineCap x:Key="PercentRingTrackStartCap">Round</PenLineCap>
+            <PenLineCap x:Key="PercentRingTrackEndCap">Round</PenLineCap>
+
+            <StaticResource x:Key="PercentRingBackgroundBrush" ResourceKey="SystemControlBackgroundBaseLowBrush" />
+
+            <StaticResource x:Key="PercentRingMainBrush" ResourceKey="SystemControlHighlightAccentBrush" />
+            <StaticResource x:Key="PercentRingMainWarningBrush" ResourceKey="SystemColorHotlightColor" />
+            <StaticResource x:Key="PercentRingMainDisabledBrush" ResourceKey="SystemControlDisabledBaseMediumLowBrush" />
+
+            <StaticResource x:Key="PercentRingTrackBrush" ResourceKey="SystemColorWindowTextColor" />
+            <StaticResource x:Key="PercentRingTrackWarningBrush" ResourceKey="SystemColorWindowTextColor" />
+            <StaticResource x:Key="PercentRingTrackDisabledBrush" ResourceKey="SystemControlDisabledBaseMediumLowBrush" />
+        </ResourceDictionary>
+
+
+        <ResourceDictionary x:Key="Light">
+            <x:Double x:Key="PercentRingMainRingThickness">3</x:Double>
+            <x:Double x:Key="PercentRingTrackRingThickness">1</x:Double>
+
+            <Thickness x:Key="PercentRingPadding">0</Thickness>
+
+            <PenLineCap x:Key="PercentRingMainStartCap">Round</PenLineCap>
+            <PenLineCap x:Key="PercentRingMainEndCap">Round</PenLineCap>
+            <PenLineCap x:Key="PercentRingTrackStartCap">Round</PenLineCap>
+            <PenLineCap x:Key="PercentRingTrackEndCap">Round</PenLineCap>
+
+            <StaticResource x:Key="PercentRingBackgroundBrush" ResourceKey="ControlFillColorTransparentBrush" />
+
+            <StaticResource x:Key="PercentRingMainBrush" ResourceKey="AccentFillColorDefaultBrush" />
+            <StaticResource x:Key="PercentRingMainWarningBrush" ResourceKey="SystemFillColorCautionBrush" />
+            <StaticResource x:Key="PercentRingMainDisabledBrush" ResourceKey="AccentFillColorDisabledBrush" />
+
+            <StaticResource x:Key="PercentRingTrackBrush" ResourceKey="ControlStrongStrokeColorDefaultBrush" />
+            <StaticResource x:Key="PercentRingTrackWarningBrush" ResourceKey="ControlStrongStrokeColorDefaultBrush" />
+            <StaticResource x:Key="PercentRingTrackDisabledBrush" ResourceKey="ControlStrongStrokeColorDisabledBrush" />
+        </ResourceDictionary>
+
+    </ResourceDictionary.ThemeDictionaries>
+
+
+</ResourceDictionary>
