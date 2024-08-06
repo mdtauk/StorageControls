@@ -34,6 +34,17 @@ namespace StorageControls
         ///
 
         /// <summary>
+        /// Identifies the TrackRingBrush dependency property.
+        /// </summary>
+        public static readonly DependencyProperty TrackRingBrushProperty =
+            DependencyProperty.Register(
+                nameof(TrackRingBrush),
+                typeof(Brush),
+                typeof(PercentageRing),
+                new PropertyMetadata(null, OnBrushChanged));
+
+
+        /// <summary>
         /// Gets or sets the Track ring brush.
         /// </summary>
         public Brush TrackRingBrush
@@ -44,18 +55,7 @@ namespace StorageControls
 
 
         /// <summary>
-        /// Identifies the TrackRingBrush dependency property.
-        /// </summary>
-        public static readonly DependencyProperty TrackRingBrushProperty =
-            DependencyProperty.Register(
-                nameof(TrackRingBrush),
-                typeof(Brush),
-                typeof(PercentageRing),
-                new PropertyMetadata(null, OnBrushChanged)); 
-
-
-        /// <summary>
-        /// Handles the change in Main and Track Ring Brush property.
+        /// Handles the change in Main and Track Ring Brush properties.
         /// </summary>
         /// <param name="d">The DependencyObject representing the control.</param>
         /// <param name="e">The event arguments containing the old and new values.</param>
@@ -244,7 +244,7 @@ namespace StorageControls
         #region PercentWarning (double)
 
         /// <summary>
-        /// Identifies the MainRingThickness dependency property.
+        /// Identifies the PercentWarning dependency property.
         /// </summary>
         public static readonly DependencyProperty PercentWarningProperty =
             DependencyProperty.Register(
@@ -255,7 +255,7 @@ namespace StorageControls
 
 
         /// <summary>
-        /// Gets or sets the thickness of the Main Ring.
+        /// Gets or sets the PercentWarning double value.
         /// </summary>
         public double PercentWarning
         {
@@ -265,7 +265,7 @@ namespace StorageControls
 
 
         /// <summary>
-        /// Handles the change in Main and Track Ring Thickness properties.
+        /// Handles the change in the PercentWarning property.
         /// </summary>
         /// <param name="d">The DependencyObject representing the control.</param>
         /// <param name="e">The event arguments containing the old and new values.</param>

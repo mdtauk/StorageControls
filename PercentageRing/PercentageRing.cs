@@ -119,7 +119,7 @@ namespace StorageControls
         }
 
         /// <summary>
-        /// Sets the private Track Ting Thickness value
+        /// Sets the private Track Ring Thickness value
         /// </summary>
         void SetTrackRingThickness(double value)
         {
@@ -162,7 +162,7 @@ namespace StorageControls
         }
 
         /// <summary>
-        /// Sets the private Canvas reference
+        /// Sets the private Container Grid reference
         /// </summary>
         void SetContainerGrid(Grid grid)
         {
@@ -370,22 +370,20 @@ namespace StorageControls
         /// </summary>
         public PercentageRing()
         {
-            SizeChanged -= SizeChangedHandler;
+            SizeChanged -= PercentageRing_SizeChanged;
             Unloaded -= PercentageRing_Unloaded;
-            IsEnabledChanged -= PercentRing_IsEnabledChanged;
+            IsEnabledChanged -= PercentageRing_IsEnabledChanged;
 
             DefaultStyleKey = typeof(PercentageRing);
 
-            SizeChanged += SizeChangedHandler;
+            SizeChanged += PercentageRing_SizeChanged;
             Unloaded += PercentageRing_Unloaded;
-            IsEnabledChanged += PercentRing_IsEnabledChanged;
+            IsEnabledChanged += PercentageRing_IsEnabledChanged;
         }
 
 
 
-        /// <summary>
-        /// Runs when the control has it's template applied to it
-        /// </summary>
+        /// <inheritdoc/>
         protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
@@ -425,7 +423,7 @@ namespace StorageControls
         /// </summary>
         /// <param name="sender">The object that triggered the event.</param>
         /// <param name="e">The event arguments containing information about the size change.</param>
-        private void SizeChangedHandler(object sender , SizeChangedEventArgs e)
+        private void PercentageRing_SizeChanged(object sender , SizeChangedEventArgs e)
         {
             var pRing = sender as PercentageRing;
 
@@ -490,7 +488,7 @@ namespace StorageControls
 
 
         /// <inheritdoc/>
-        private void PercentRing_IsEnabledChanged(object sender , DependencyPropertyChangedEventArgs e)
+        private void PercentageRing_IsEnabledChanged(object sender , DependencyPropertyChangedEventArgs e)
         {
             OnIsEnabledChanged();
         }
@@ -565,7 +563,6 @@ namespace StorageControls
         /// Updates the layout of a PercentageRing control.
         /// </summary>
         /// <param name="d">The DependencyObject representing the control.</param>
-        /// <param name="useTransition">Indicates whether to use a transition effect.</param>
         private void UpdateLayout(DependencyObject d)
         {
             var pRing = (PercentageRing)d;
@@ -1004,11 +1001,11 @@ namespace StorageControls
                 return interpolatedAngle;
             }
 
-            #endregion
+        #endregion
 
 
 
-        #region 8. Conversion return methods
+        #region 8. Conversion return functions
 
         /// <summary>
         /// Calculates a point on a circle given an angle and radius.

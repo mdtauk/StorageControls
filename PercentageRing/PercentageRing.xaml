@@ -31,8 +31,13 @@
                 <ControlTemplate TargetType="local:PercentageRing">
                     <Grid Width="{TemplateBinding Width}"
                           Height="{TemplateBinding Height}"
+                          MinWidth="{TemplateBinding MinWidth}"
+                          MinHeight="{TemplateBinding MinHeight}"
+                          MaxWidth="{TemplateBinding MaxWidth}"
+                          MaxHeight="{TemplateBinding MaxHeight}"
                           Padding="{TemplateBinding Padding}"
                           Background="Transparent"
+                          BorderBrush="{TemplateBinding BorderBrush}"
                           BorderThickness="{TemplateBinding BorderThickness}">
                         <Grid x:Name="PART_Container"
                               HorizontalAlignment="Center"

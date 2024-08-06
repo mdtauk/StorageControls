@@ -6,9 +6,36 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:PercentageBar">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}" />
+
+                    <Grid x:Name="GridRoot" Padding="{TemplateBinding Padding}">
+
+                        <Grid x:Name="PART_Container"
+                              Width="{TemplateBinding Width}"
+                              Height="{TemplateBinding Height}"
+                              MinWidth="{TemplateBinding MinWidth}"
+                              MinHeight="{TemplateBinding MinHeight}"
+                              MaxWidth="{TemplateBinding MaxWidth}"
+                              MaxHeight="{TemplateBinding MaxHeight}"
+                              Background="{TemplateBinding Background}"
+                              BorderBrush="{TemplateBinding BorderBrush}"
+                              BorderThickness="{TemplateBinding BorderThickness}"
+                              FlowDirection="{TemplateBinding FlowDirection}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition x:Name="PART_LeftColumn" />
+
+                                <ColumnDefinition x:Name="PART_GapColumn" />
+
+                                <ColumnDefinition x:Name="PART_RightColumn" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border x:Name="PART_MainBar" Background="{TemplateBinding MainBarBrush}" />
+
+                            <Border x:Name="PART_TrackBar" Background="{TemplateBinding TrackBarBrush}" />
+
+                        </Grid>
+
+                    </Grid>
+
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
