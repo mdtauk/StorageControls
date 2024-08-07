@@ -511,11 +511,11 @@ namespace StorageControls
                     mainColumn.MinWidth = pBar.GetMainBarHeight();
                     trackColumn.MinWidth = pBar.GetTrackBarHeight();
 
-                    //double valuePercent = pBar.DoubleToPercentage(pBar.Value, pBar.Minimum, pBar.Maximum);
+                    double valuePercent = pBar.DoubleToPercentage(pBar.Value, pBar.Minimum, pBar.Maximum);
 
-                    //double calculatedMainWidth = (mainColumn.MaxWidth / 100) * valuePercent;
+                    double calculatedMainWidth = (mainColumn.MaxWidth / 100) * valuePercent;
 
-                    mainColumn.Width = new GridLength( mainColumn.ActualWidth * ( pBar.Value / ( pBar.Maximum - pBar.Minimum ) ) );
+                    mainColumn.Width = new GridLength( calculatedMainWidth );
                 }
             }
         }

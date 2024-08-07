@@ -16,6 +16,8 @@
         <Setter Property="TrackBarBrush" Value="Gray" />
         <Setter Property="TrackBarHeight" Value="{ThemeResource PercentageBarTrackHeight}" />
         <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="Minimum" Value="0" />
+        <Setter Property="Maximum" Value="100" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:PercentageBar">
@@ -48,20 +50,20 @@
                                     Grid.Column="0"
                                     Height="{TemplateBinding MainBarHeight}"
                                     HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Stretch"
+                                    VerticalAlignment="Center"
                                     Background="{TemplateBinding MainBarBrush}" />
 
                             <Border x:Name="PART_TrackBar"
                                     Grid.Column="2"
                                     Height="{TemplateBinding TrackBarHeight}"
                                     HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Stretch"
+                                    VerticalAlignment="Center"
                                     Background="{TemplateBinding TrackBarBrush}" />
 
-                            <TextBlock Grid.ColumnSpan="3"
+                            <NumberBox Grid.ColumnSpan="3"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"
-                                       Text="{TemplateBinding Value}" />
+                                       Value="{TemplateBinding Value}" />
 
                         </Grid>
 

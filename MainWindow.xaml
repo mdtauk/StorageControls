@@ -56,8 +56,13 @@
                         Orientation="Vertical"
                         Spacing="24">
 
-                <local:PercentageBar IsEnabled="{x:Bind testEnabledToggle.IsOn, Mode=TwoWay}" 
-                                     Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
+                <local:PercentageBar x:Name="TestBoon"
+                            IsEnabled="{x:Bind testEnabledToggle.IsOn, Mode=TwoWay}"
+                            Value="{x:Bind testSlider.Value, Mode=TwoWay}" />
+
+                <Button x:Name="TestBoonButton"
+                        Click="TestBoonButton_Click"
+                        Content="TestBoon" />
 
                 <NumberBox x:Name="HeightTest"
                            Width="320"

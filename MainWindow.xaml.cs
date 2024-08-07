@@ -11,5 +11,10 @@ namespace StorageControls
         {
             this.InitializeComponent();
         }
+
+        private void TestBoonButton_Click(object sender , RoutedEventArgs e)
+        {
+            TestBoon.Value = 75;
+        }
     }
 }
