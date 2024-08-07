@@ -450,6 +450,7 @@ namespace StorageControls
             UpdateColumnWidths( pBar , pBar.Value , pBar.Minimum , pBar.Maximum );
 
             // 3. Update the control's VisualState
+            UpdateVisualState( pBar );
         }
 
 
@@ -502,20 +503,50 @@ namespace StorageControls
             if ( gapColumn != null || mainColumn != null || trackColumn != null )
             {
                 if ( pBar.GetContainerSize().Width > pBar.GetTrackBarHeight() || pBar.GetContainerSize().Width > pBar.GetMainBarHeight() )
-                { 
-                    gapColumn.Width = new GridLength( pBar.GetGapWidth() );
-
-                    mainColumn.MaxWidth = pBar.GetContainerSize().Width - ( pBar.GetMainBarHeight() + pBar.GetTrackBarHeight() );
-                    trackColumn.MaxWidth = pBar.GetContainerSize().Width - ( pBar.GetMainBarHeight() + pBar.GetTrackBarHeight() );
-
-                    mainColumn.MinWidth = pBar.GetMainBarHeight();
-                    trackColumn.MinWidth = pBar.GetTrackBarHeight();
-
+                {                 
                     double valuePercent = pBar.DoubleToPercentage(pBar.Value, pBar.Minimum, pBar.Maximum);
+                    double minPercent   = pBar.DoubleToPercentage(pBar.Minimum, pBar.Minimum, pBar.Maximum);
+                    double maxPercent   = pBar.DoubleToPercentage(pBar.Maximum, pBar.Minimum, pBar.Maximum);
 
-                    double calculatedMainWidth = (mainColumn.MaxWidth / 100) * valuePercent;
+                    if ( valuePercent <= minPercent )           // Value is <= Minimum
+                    {
+                        gapColumn.Width = new GridLength(0);
 
-                    mainColumn.Width = new GridLength( calculatedMainWidth );
+                        mainColumn.Width = new GridLength(0);
+
+                        trackColumn.MaxWidth = 0;
+                        trackColumn.MinWidth = pBar.GetContainerSize().Width;
+
+                        mainColumn.MaxWidth = pBar.GetContainerSize().Width;
+                        mainColumn.MinWidth = 0;
+                    }
+                    else if ( valuePercent >= maxPercent )     // Value is >= Maximum
+                    {
+                        gapColumn.Width = new GridLength( 0 );
+
+                        trackColumn.Width = new GridLength( 0 );
+
+                        trackColumn.MaxWidth = pBar.GetContainerSize().Width;
+                        trackColumn.MinWidth = 0;
+
+                        mainColumn.MaxWidth = 0;
+                        mainColumn.MinWidth = pBar.GetContainerSize().Width;
+                    }
+                    else
+                    {
+                        gapColumn.Width = new GridLength( pBar.GetGapWidth() );
+
+                        mainColumn.MaxWidth = pBar.GetContainerSize().Width - ( pBar.GetMainBarHeight() + pBar.GetTrackBarHeight() );
+                        trackColumn.MaxWidth = pBar.GetContainerSize().Width - ( pBar.GetMainBarHeight() + pBar.GetTrackBarHeight() );
+
+                        mainColumn.MinWidth = pBar.GetMainBarHeight();
+                        trackColumn.MinWidth = pBar.GetTrackBarHeight();
+
+                        double calculatedMainWidth = (mainColumn.MaxWidth / 100) * valuePercent;
+
+                        mainColumn.Width = new GridLength( calculatedMainWidth );
+                        trackColumn.Width = new GridLength( 1 , GridUnitType.Star );
+                    }
                 }
             }
         }
@@ -532,19 +563,44 @@ namespace StorageControls
             pBar.SetContainerSize( new Size( containerWidth, containerHeight ));
         }
 
+
+
+        private static void UpdateVisualState(DependencyObject d)
+        {
+            var pBar = (PercentageBar)d;
+
+            if ( pBar.IsEnabled == false )
+            {
+                VisualStateManager.GoToState( pBar , DisabledStateName , true );
+            }
+            else
+            {
+                double currentPercentage = pBar.DoubleToPercentage( pBar.Value , pBar.Minimum , pBar.Maximum );
+
+                if ( currentPercentage >= pBar.PercentWarning )
+                {
+                    VisualStateManager.GoToState( pBar , WarningStateName , true );
+                }
+                else
+                {
+                    VisualStateManager.GoToState( pBar , SafeStateName , true );
+                }
+            }
+        }
+
         #endregion
 
 
 
         #region 7. Conversion return functions
 
-            /// <summary>
-            /// Converts a value within a specified range to a percentage.
-            /// </summary>
-            /// <param name="value">The value to convert.</param>
-            /// <param name="minValue">The minimum value of the input range.</param>
-            /// <param name="maxValue">The maximum value of the input range.</param>
-            /// <returns>The percentage value (between 0 and 100).</returns>
+        /// <summary>
+        /// Converts a value within a specified range to a percentage.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <param name="minValue">The minimum value of the input range.</param>
+        /// <param name="maxValue">The maximum value of the input range.</param>
+        /// <returns>The percentage value (between 0 and 100).</returns>
             private double DoubleToPercentage(double value , double minValue , double maxValue)
         {
             // Ensure value is within the specified range

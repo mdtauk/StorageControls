@@ -29,8 +29,8 @@
                                   IsEnabled="{x:Bind testEnabledToggle.IsOn, Mode=TwoWay}"
                                   LargeChange="10"
                                   MainRingThickness="{x:Bind MainThickness.Value, Mode=TwoWay}"
-                                  Maximum="90"
-                                  Minimum="10"
+                                  Maximum="100"
+                                  Minimum="0"
                                   SmallChange="0.1"
                                   TrackRingThickness="{x:Bind TrackThickness.Value, Mode=TwoWay}"
                                   Value="{x:Bind valueTest.Value, Mode=TwoWay}" />

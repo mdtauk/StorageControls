@@ -12,29 +12,65 @@
     <ResourceDictionary.ThemeDictionaries>
 
         <ResourceDictionary x:Key="Default">
+            <StaticResource x:Key="PercentageBarCornerRadius" ResourceKey="OverlayCornerRadius" />
             <CornerRadius x:Key="PercentageBarMainCornerRadius">3</CornerRadius>
             <x:Double x:Key="PercentageBarMainHeight">6</x:Double>
+            <Thickness x:Key="PercentageBarPadding">4,4,4,4</Thickness>
 
-            <CornerRadius x:Key="PercentageBarTrackCornerRadius">1.5</CornerRadius>
-            <x:Double x:Key="PercentageBarTrackHeight">3</x:Double>
+            <CornerRadius x:Key="PercentageBarTrackCornerRadius">1</CornerRadius>
+            <x:Double x:Key="PercentageBarTrackHeight">2</x:Double>
+
+            <StaticResource x:Key="PercentageBarBackgroundBrush" ResourceKey="ControlFillColorTransparentBrush" />
+
+            <StaticResource x:Key="PercentageBarMainBrush" ResourceKey="AccentFillColorDefaultBrush" />
+            <StaticResource x:Key="PercentageBarMainWarningBrush" ResourceKey="SystemFillColorCautionBrush" />
+            <StaticResource x:Key="PercentageBarMainDisabledBrush" ResourceKey="AccentFillColorDisabledBrush" />
+
+            <StaticResource x:Key="PercentageBarTrackBrush" ResourceKey="ControlStrongStrokeColorDefaultBrush" />
+            <StaticResource x:Key="PercentageBarTrackWarningBrush" ResourceKey="ControlStrongStrokeColorDefaultBrush" />
+            <StaticResource x:Key="PercentageBarTrackDisabledBrush" ResourceKey="ControlStrongStrokeColorDisabledBrush" />
         </ResourceDictionary>
 
 
         <ResourceDictionary x:Key="HighContrast">
+            <StaticResource x:Key="PercentageBarCornerRadius" ResourceKey="OverlayCornerRadius" />
             <CornerRadius x:Key="PercentageBarMainCornerRadius">3</CornerRadius>
             <x:Double x:Key="PercentageBarMainHeight">6</x:Double>
+            <Thickness x:Key="PercentageBarPadding">4,4,4,4</Thickness>
 
-            <CornerRadius x:Key="PercentageBarTrackCornerRadius">1.5</CornerRadius>
-            <x:Double x:Key="PercentageBarTrackHeight">3</x:Double>
+            <CornerRadius x:Key="PercentageBarTrackCornerRadius">1</CornerRadius>
+            <x:Double x:Key="PercentageBarTrackHeight">2</x:Double>
+
+            <StaticResource x:Key="PercentageBarBackgroundBrush" ResourceKey="SystemControlBackgroundBaseLowBrush" />
+
+            <StaticResource x:Key="PercentageBarMainBrush" ResourceKey="SystemColorHighlightColorBrush" />
+            <StaticResource x:Key="PercentageBarMainWarningBrush" ResourceKey="SystemColorHotlightColorBrush" />
+            <StaticResource x:Key="PercentageBarMainDisabledBrush" ResourceKey="SystemColorGrayTextBrush" />
+
+            <StaticResource x:Key="PercentageBarTrackBrush" ResourceKey="SystemColorWindowTextColorBrush" />
+            <StaticResource x:Key="PercentageBarTrackWarningBrush" ResourceKey="SystemColorWindowTextColorBrush" />
+            <StaticResource x:Key="PercentageBarTrackDisabledBrush" ResourceKey="SystemColorGrayTextBrush" />
         </ResourceDictionary>
 
 
         <ResourceDictionary x:Key="Light">
+            <StaticResource x:Key="PercentageBarCornerRadius" ResourceKey="OverlayCornerRadius" />
             <CornerRadius x:Key="PercentageBarMainCornerRadius">3</CornerRadius>
             <x:Double x:Key="PercentageBarMainHeight">6</x:Double>
+            <Thickness x:Key="PercentageBarPadding">4,4,4,4</Thickness>
 
-            <CornerRadius x:Key="PercentageBarTrackCornerRadius">1.5</CornerRadius>
-            <x:Double x:Key="PercentageBarTrackHeight">3</x:Double>
+            <CornerRadius x:Key="PercentageBarTrackCornerRadius">1</CornerRadius>
+            <x:Double x:Key="PercentageBarTrackHeight">2</x:Double>
+
+            <StaticResource x:Key="PercentageBarBackgroundBrush" ResourceKey="ControlFillColorTransparentBrush" />
+
+            <StaticResource x:Key="PercentageBarMainBrush" ResourceKey="AccentFillColorDefaultBrush" />
+            <StaticResource x:Key="PercentageBarMainWarningBrush" ResourceKey="SystemFillColorCautionBrush" />
+            <StaticResource x:Key="PercentageBarMainDisabledBrush" ResourceKey="AccentFillColorDisabledBrush" />
+
+            <StaticResource x:Key="PercentageBarTrackBrush" ResourceKey="ControlStrongStrokeColorDefaultBrush" />
+            <StaticResource x:Key="PercentageBarTrackWarningBrush" ResourceKey="ControlStrongStrokeColorDefaultBrush" />
+            <StaticResource x:Key="PercentageBarTrackDisabledBrush" ResourceKey="ControlStrongStrokeColorDisabledBrush" />
         </ResourceDictionary>
 
     </ResourceDictionary.ThemeDictionaries>

@@ -17,15 +17,15 @@
         <Setter Property="Padding" Value="0" />
         <Setter Property="Height" Value="16" />
         <Setter Property="Width" Value="16" />
-        <Setter Property="MainRingBrush" Value="{ThemeResource PercentRingMainBrush}" />
-        <Setter Property="TrackRingBrush" Value="{ThemeResource PercentRingTrackBrush}" />
-        <Setter Property="Background" Value="{ThemeResource PercentRingBackgroundBrush}" />
-        <Setter Property="MainRingThickness" Value="{ThemeResource PercentRingMainRingThickness}" />
-        <Setter Property="TrackRingThickness" Value="{ThemeResource PercentRingTrackRingThickness}" />
-        <Setter Property="MainRingStartCap" Value="{ThemeResource PercentRingMainStartCap}" />
-        <Setter Property="MainRingEndCap" Value="{ThemeResource PercentRingMainEndCap}" />
-        <Setter Property="TrackRingStartCap" Value="{ThemeResource PercentRingTrackStartCap}" />
-        <Setter Property="TrackRingEndCap" Value="{ThemeResource PercentRingTrackEndCap}" />
+        <Setter Property="MainRingBrush" Value="{ThemeResource PercentageRingMainBrush}" />
+        <Setter Property="TrackRingBrush" Value="{ThemeResource PercentageRingTrackBrush}" />
+        <Setter Property="Background" Value="{ThemeResource PercentageRingBackgroundBrush}" />
+        <Setter Property="MainRingThickness" Value="{ThemeResource PercentageRingMainRingThickness}" />
+        <Setter Property="TrackRingThickness" Value="{ThemeResource PercentageRingTrackRingThickness}" />
+        <Setter Property="MainRingStartCap" Value="{ThemeResource PercentageRingMainStartCap}" />
+        <Setter Property="MainRingEndCap" Value="{ThemeResource PercentageRingMainEndCap}" />
+        <Setter Property="TrackRingStartCap" Value="{ThemeResource PercentageRingTrackStartCap}" />
+        <Setter Property="TrackRingEndCap" Value="{ThemeResource PercentageRingTrackEndCap}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:PercentageRing">
@@ -72,10 +72,7 @@
                                 <VisualState x:Name="Warning">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_MainRingShape" Storyboard.TargetProperty="Stroke">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PercentRingMainWarningBrush}" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_TrackRingShape" Storyboard.TargetProperty="Stroke">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PercentRingTrackDisabledBrush}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PercentageRingMainWarningBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -83,10 +80,10 @@
                                 <VisualState x:Name="Disabled">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_MainRingShape" Storyboard.TargetProperty="Stroke">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PercentRingMainDisabledBrush}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PercentageRingMainDisabledBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_TrackRingShape" Storyboard.TargetProperty="Stroke">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PercentRingTrackDisabledBrush}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PercentageRingTrackDisabledBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>

@@ -9,13 +9,13 @@
 
 
     <Style TargetType="local:PercentageBar">
-        <Setter Property="Padding" Value="4" />
-        <Setter Property="Background" Value="#33FFFFFF" />
-        <Setter Property="MainBarBrush" Value="Red" />
+        <Setter Property="Padding" Value="{ThemeResource PercentageBarPadding}" />
+        <Setter Property="Background" Value="{ThemeResource PercentageBarBackgroundBrush}" />
+        <Setter Property="MainBarBrush" Value="{ThemeResource PercentageBarMainBrush}" />
         <Setter Property="MainBarHeight" Value="{ThemeResource PercentageBarMainHeight}" />
-        <Setter Property="TrackBarBrush" Value="Gray" />
+        <Setter Property="TrackBarBrush" Value="{ThemeResource PercentageBarTrackBrush}" />
         <Setter Property="TrackBarHeight" Value="{ThemeResource PercentageBarTrackHeight}" />
-        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="CornerRadius" Value="{ThemeResource PercentageBarCornerRadius}" />
         <Setter Property="Minimum" Value="0" />
         <Setter Property="Maximum" Value="100" />
         <Setter Property="Template">
@@ -31,7 +31,6 @@
                           MaxHeight="{TemplateBinding MaxHeight}"
                           Padding="{TemplateBinding Padding}"
                           Background="{TemplateBinding Background}">
-
                         <Grid x:Name="PART_Container"
                               HorizontalAlignment="Stretch"
                               VerticalAlignment="Stretch"
@@ -60,13 +59,34 @@
                                     VerticalAlignment="Center"
                                     Background="{TemplateBinding TrackBarBrush}" />
 
-                            <NumberBox Grid.ColumnSpan="3"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"
-                                       Value="{TemplateBinding Value}" />
-
                         </Grid>
 
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="ControlStates">
+
+                                <VisualState x:Name="Safe" />
+
+                                <VisualState x:Name="Warning">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_MainBar" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PercentageBarMainWarningBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_MainBar" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PercentageBarMainDisabledBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_TrackBar" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PercentageBarTrackDisabledBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
                     </Grid>
 
                 </ControlTemplate>
